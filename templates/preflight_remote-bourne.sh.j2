@@ -1,0 +1,127 @@
+#jinja2:trip_blocks:False
+# ***************************************************************************************
+#
+# {{ ansible_managed }}
+#
+# ***************************************************************************************
+
+check_backup_space() {
+
+	BACKUP_DATA_FLAG_PATH="{{ backup_script_directory }}/BackupDataFlag"
+	FREE_BACKUP_SPACE=$(df {{ backup_mount_point }} | awk 'NR >1 { print $4 }')
+	BACKUP_TYPE=$(cat $BACKUP_DATA_FLAG_PATH)
+	BACKUP_SOURCE="$1"
+
+       # Check to see if it's the first of a month.  If so change the backup type to full.  I need to make sure we get at least one complete backup a month
+
+        DAY_OF_MONTH=$(date | awk '{ print $3 }')
+
+        if [ $DAY_OF_MONTH -eq 1 ]; then
+		echo "A" > $BACKUP_DATA_FLAG_PATH
+	fi
+
+	if [ $BACKUP_TYPE == "E" ]; then
+		CURR_FILTER=""
+		{%- for item2 in backup_exclude_directories %}
+			CURR_FILTER="${CURR_FILTER} -I {{ item2['path'] }} "
+		
+		{%- endfor %}
+
+		# Excluding static data (pics, videos, archives
+		#
+		SOURCE_DIR_SPACE=$(du -s $CURR_FILTER $BACKUP_SOURCE | awk '{ print $1 }')
+	else
+		# Backup everything
+		SOURCE_DIR_SPACE=$(du -s $BACKUP_SOURCE | awk ' { print $1 }')
+	fi
+	
+	if [ $FREE_BACKUP_SPACE -gt $SOURCE_DIR_SPACE ]; then
+		SUFFICIENT_SPACE=0
+	else
+		SUFFICIENT_SPACE=1
+	fi
+	
+	return 0
+}
+
+#!/bin/sh
+#*****************************************************************************************
+#                              Managed by Ansible
+#*****************************************************************************************
+
+SUFFICIENT_SPACE=1
+BACKUP_DIRECTORY={{ backup_mount_point }}/{{ backup_remote_hostname }}
+VIRUS_STAT=""
+TOT_BACKUP_SPACE=0
+SPACE_NEEDED=0
+
+# mount backup share if necessary
+
+mount {{ backup_mount_point }}
+
+cd {{ backup_script_directory }}
+
+# Make sure the data has no viruses, check that status
+
+if [ -f {{ backup_script_directory }}/virus_scan_status.txt ]; then
+	VIRUS_STAT=$(cat {{ backup_script_directory }}/virus_scan_status.txt)
+fi
+
+{% for item in backup_locations_to_backup -%}
+{% if item['source_mounted'] == true -%}
+
+# check_backup_space for {{ item['source_path'] }}
+
+
+SUFFICIENT_SPACE=1
+
+if [ $SUFFICIENT_SPACE -eq 1 ] && [ $VIRUS_STAT == "CLEAN" ]; then
+{% if item['file_copy'] == true -%}
+
+	FILE_SIZE=$(stat -c %s {{ item['file_path'] }})
+	SPACE_NEEDED=$(expr $SPACE_NEEDED + $FILE_SIZE)
+{% else -%}
+
+	check_backup_space {{ item['source_path'] }}
+	SPACE_NEEDED=$(expr $SPACE_NEEDED + $SOURCE_DIR_SPACE)
+	TOT_BACKUP_SPACE=$(expr $TOT_BACKUP_SPACE + $SPACE_NEEDED)
+{% endif -%}
+fi
+
+{% endif -%}
+{% endfor -%}
+
+# now purge prior backups if there's not enough space for current backup
+
+TOT_FREE_BACKUP=$(df {{ backup_mount_point }} | awk 'NR >1 { print $4 }')
+
+if [ $TOT_BACKUP_SPACE -gt $TOT_FREE_BACKUP ]; then
+	for CURR_DIRECTORY in $( find $BACKUP_DIRECTORY -maxdepth 1 -type d -exec basename {} \;| grep "^[0-9]" | sort)
+		do
+			CURR_FREE_SPACE=$(df {{ backup_mount_point }} | awk 'NR >1 { print $4 }')
+			if [ $TOT_BACKUP_SPACE -gt $CURR_FREE_SPACE ]; then
+				SUFFICIENT_SPACE=1
+				rm -Rfv $BACKUP_DIRECTORY"/"$CURR_DIRECTORY >/dev/null
+			else
+				SUFFICIENT_SPACE=0
+				break
+			fi
+		done
+fi
+
+
+
+echo $SUFFICIENT_SPACE > {{ backup_script_directory }}/free_space_for_backup.txt
+
+
+# if we have enough space for the backup and it's virus free, run the backup
+
+
+if [ $SUFFICIENT_SPACE -eq 0 ] && [ $VIRUS_STAT == "CLEAN" ]; then
+	sh {{ backup_script_directory }}/BackupData.sh R 0
+	umount {{ backup_mount_point }}
+	exit 0
+else	
+	umount {{ backup_mount_point }}
+	exit 1
+fi

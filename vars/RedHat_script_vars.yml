@@ -1,0 +1,8 @@
+---
+
+# backup scripts
+backup_scripts:
+  - template_name: BackupData-bash.sh.j2
+    script_name: BackupData.sh
+  - template_name: preflight_remote-bash-shell.sh.j2
+    script_name: preflight_remote.sh

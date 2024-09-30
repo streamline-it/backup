@@ -1,0 +1,47 @@
+- name: ensure backup script(s) directory exists
+  ansible.builtin.file:
+    path: "{{ backup_script_directory }}"
+    state: directory
+
+- name: ensure BackupDataFlag file exists
+  ansible.builtin.copy:
+    src: BackupDataFlag
+    dest: "{{ backup_script_directory }}/BackupDataFlag"
+
+- name: ensure free_space_for_backup.txt file exists
+  ansible.builtin.copy:
+    src: free_space_for_backup.txt
+    dest: "{{ backup_script_directory }}/free_space_for_backup.txt "
+
+- name: ensure virus scan results file exists
+  ansible.builtin.copy:
+    src: virus_scan_status.txt
+    dest: "{{ backup_script_directory }}/virus_scan_status.txt"
+
+- name: ensure tarexludeddirectories file exists
+  ansible.builtin.copy:
+    src: tarexcludeddirectories
+    dest: "{{ backup_script_directory }}/tarexcludeddirectories"
+
+- name: ensure backup scripts exists
+  loop:
+    "{{ backup_scripts }}"
+  ansible.builtin.template:
+    src: "{{ item['template_name'] }}"
+    dest: "{{ backup_script_directory }}/{{ item['script_name'] }}"
+    owner: root
+    mode: "0770"
+
+- name: ensure backup mount directory(s) exists
+  ansible.builtin.file:
+    path: "{{ backup_mount_point }}"
+    state: directory
+
+- name: ensure backup mount(s) exists in fstab
+  ansible.builtin.mount:
+    src: "{{ backup_locations_to_backup[0]['remote_path'] }}"
+    path: "{{ backup_mount_point }}"
+    fstype: nfs
+    boot: false
+    dump: "0"
+    state: present

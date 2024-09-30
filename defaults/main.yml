@@ -1,0 +1,94 @@
+---
+# defaults file for backup
+# As a backup host this will have the capability of backing up multiple hosts.  The backup_remote_hostname variable will
+# be used to create a directory, all backups for that host will exist under it.  The backup host will also have 2 locatiions
+# for backups.  One on the live filesystem, the second on an optional external drive, and the 3rd optional backup location
+# can be a remote cloud backup.  Variables will control whether the external drive (backup_external_drive_option: true/false) or
+# the cloud backup (backup_cloud_backup_option: true/false) will be used.
+# The host will have a script that will drive where to save the backups, the backup host's only responsibility is to take that  
+# latest backup and push it to the external and/or cloud backup.
+
+# for backup_operation if = r - Run for the remote host
+#                      if = h - Run this for the backup host itself
+#
+backup_operation: r or h
+
+# directory where backups are stored
+
+backup_directory:
+  dir_name: /backups
+  owner: root
+  groups: root
+
+backup_logfile_path: "{{ backup_directory['dir_name'] }}/backup_log.txt"
+backup_script_directory: /root/scripts/backup
+
+# purpose is to place the backups underneath a directory of the host's name
+backup_remote_hostname: host
+
+# remote host's mount point for backup host
+backup_mount_point: /backup
+
+# if true the backup host will duplicate the latest backup to an external drive
+backup_external_drive_option: false
+
+# external drive device; used to create the partition and filesystem
+backup_external_drive:
+  - dev_name: /dev/<device>
+    size: 1G
+    fstype: xfs
+    mount_point: /mnt/backup
+
+# If true the latest backup will duplicated to a remote cloud provider from the backup host
+backup_cloud_backup_option: false
+
+# Below are the cronjob variables a cronjob for the backup host specific to the remote drive option
+backup_external_drive_kickoff_time_hour: 11
+backup_external_drive_kickoff_time_minute: 0
+backup_external_drive_kickoff_time_day: '*'
+backup_external_drive_kickoff_time_month: '*'
+backup_external_drive_kickoff_time_weekday: '0-7'
+backup_external_drive_cronjob_name: ext_drive_backup
+backup_external_drive_cronjob_job: "echo 'setup your cronjob for external drive backup'"
+
+
+# Below are the cronjob variables a cronjob for the backup host specific to the cloud option
+backup_cloud_backup_kickoff_time_hour: 13
+backup_cloud_backup_kickoff_time_minute: 0
+backup_cloud backup_kickoff_time_day: '*'
+backup_cloud backup_kickoff_time_month: '*'
+backup_cloud backup_kickoff_time_weekday: '0-7'
+backup_cloud_backup_cronjob_name: cloud_backup
+backup_cloud_backup_cronjob_job: "echo 'setup your cronjob for cloud backup'"
+
+# user to run the cronjob for
+backup_cronjob_user: root
+
+# for backup_locations_to_backup, this variable will be used with the backup script in a rsync command.  The "exclude_filter" will 
+# include the directories/files to include.  The hostname variable will be the hostname of the computer that is being backed up.
+# the backup_cmd dictionary will contain the backup command (either rsync or the cloud-specific command).  The directory holds the name of the
+# directory the files will exist under.  For example if backing up /home/rich, the directory will hold home/rich.  Remember that the
+# host_name value will be the parent directory for all backups, for that host.
+# Basically this backup_locations_to_backup dictionary list will be used to create individual rsync or remote commands for the backup
+# script to be run on the remote host.
+
+ 
+backup_locations_to_backup:
+  - source_path: /home
+    file_path: ""
+    remote_path: /backup
+    source_mounted: true
+    exclude_filter: ''
+    host_name: host
+    backup_cmd: rsync
+    directory: <directory>
+    file_copy: false
+    enabled: true
+
+# This is needed for FreeBSD systems with the preflight script which uses the du and an exclude option to exlude certain directories.  FreeBSD's du doesn't include this option.
+
+# backup_excude_directories:
+#  - path: ./priv/videos
+#  - path: ./priv/pics
+
+backup_exclude_directories: []
