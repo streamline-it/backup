@@ -22,24 +22,11 @@
     path: "{{ backup_external_drive['dev_name'] }}1"
     get_attributes: true
 
-- name: ensure the remote drive is partitioned
+- name: call task to make sure drive is partitioned
   when:
     - backup_external_drive_option == true
     - stat_var['stat']['exists'] == false
-  community.general.parted:
-    device: "{{ backup_external_drive['dev_name'] }}"
-    number: 1
-    part_start: "1MiB"
-    part_end: "{{ backup_external_drive['size'] }}"
-    state: present
-
-- name: ensure the remote drive has a filesystem
-  when:
-    - backup_external_drive_option == true
-  ansible.builtin.filesystem:
-    dev: "{{ backup_external_drive['dev_name'] }}1"
-    fstype: "{{ backup_external_drive['fstype'] }}"
-    state: present
+  ansible.builtin.include_tasks: "./tasks/{{ ansible_os_family }}_setup_external_drive.yml"
 
 - name: ensure mountpoint for external drive exists
   when:

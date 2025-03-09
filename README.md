@@ -45,11 +45,16 @@ backup_mount_point: /backup
 backup_external_drive_option: false
 
 # external drive device; used to create the partition and filesystem
+# added fullname to adjust for FreeBSD's partitions  ex device is /dev/da0, the entire device name including the
+# partition would be /dev/da0p1.  Also added a label which I prefer in FreeBSD
+
 backup_external_drive:
   - dev_name: /dev/<device>
     size: 1G
     fstype: xfs
     mount_point: /mnt/backup
+    full_name: /dev/<device><partition>
+    label: <label>
 
 # If true the latest backup will duplicated to a remote cloud provider from the backup host
 backup_cloud_backup_option: false
@@ -97,6 +102,8 @@ backup_locations_to_backup:
     file_copy: false
     enabled: true
 
+# disk label (can be  msdos/gpt) used for FreeBSD hosts
+backup_freebsd_disk_scheme: gpt
 
 
 # This is needed for FreeBSD systems with the preflight script which uses the du and an exclude option to exlude certain directories.  FreeBSD's du doesn't include this option.
