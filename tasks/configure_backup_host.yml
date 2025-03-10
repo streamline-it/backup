@@ -19,7 +19,7 @@
     - backup_external_drive_option == true
   register: stat_var
   ansible.builtin.stat:
-    path: "{{ backup_external_drive['dev_name'] }}1"
+    path: "{{ backup_external_drive[0]['full_name'] }}"
     get_attributes: true
 
 - name: call task to make sure drive is partitioned
@@ -32,16 +32,17 @@
   when:
     - backup_external_drive_option == true
   ansible.builtin.file:
-    path: "{{ backup_external_drive['mount_point'] }}"
+    path: "{{ backup_mount_point }}"
     state: directory
 
 - name: ensure the remote drive is setup in fstab
+  debugger: on_failed
   when:
     - backup_external_drive_option == true
   ansible.builtin.mount:
-    src: "{{ backup_external_drive['dev_name'] }}1"
-    path: "{{ backup_external_drive['mount_point'] }}"
-    fstype: "{{ backup_external_drive['fstype'] }}"
+    src: "{{ backup_external_drive[0]['dev_name'] }}"
+    path: "{{ backup_external_drive[0]['mount_point'] }}"
+    fstype: "{{ backup_external_drive[0]['fstype'] }}"
     boot: false
     dump: "0"
     state: present
