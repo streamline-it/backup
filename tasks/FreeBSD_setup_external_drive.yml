@@ -12,6 +12,8 @@
   when:
     - backup_external_drive_option == true
     - stat_var['stat']['exists'] == false
+  args:
+    creates: "/dev/{{ backup_external_drive[0]['full_name'] }}"
   ansible.builtin.command:
     cmd: "gpart add -t {{ backup_external_drive[0]['fstype'] }} {{ backup_external_drive[0]['dev_name'] }}"
 
@@ -24,6 +26,6 @@
 
 - name: ensure the remote drive has a filesystem
   when:
-    - backup_external_drive[0]_option == true
+    - backup_external_drive_option == true
   ansible.builtin.command:
     cmd: "newfs {{ backup_external_drive[0]['dev_name'] }}"
