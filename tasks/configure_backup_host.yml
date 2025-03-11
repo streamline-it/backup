@@ -35,17 +35,30 @@
     path: "{{ backup_mount_point }}"
     state: directory
 
-- name: ensure the remote drive is setup in fstab
-  debugger: on_failed
+- name: ensure the remote drive is setup in fstab via device name
   when:
     - backup_external_drive_option == true
+    - backup_mount_method == device
   ansible.builtin.mount:
-    src: "{{ backup_external_drive[0]['dev_name'] }}"
+    src: "{{ backup_external_drive[0]['dev_full_name'] }}"
     path: "{{ backup_external_drive[0]['mount_point'] }}"
     fstype: "{{ backup_external_drive[0]['fstype'] }}"
     boot: false
     dump: "0"
     state: present
+
+- name: ensure the remote drive is setup in fstab via label
+  when:
+    - backup_external_drive_option == true
+    - backup_mount_method == device
+  ansible.builtin.mount:
+    src: "{{ backup_external_drive[0]['label'] }}"
+    path: "{{ backup_external_drive[0]['mount_point'] }}"
+    fstype: "{{ backup_external_drive[0]['fstype'] }}"
+    boot: false
+    dump: "0"
+    state: present
+
 
 - name: ensure the external drive cronjob exists
   when:

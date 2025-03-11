@@ -78,6 +78,11 @@ backup_cloud backup_kickoff_time_weekday: '0-7'
 backup_cloud_backup_cronjob_name: cloud_backup
 backup_cloud_backup_cronjob_job: "echo 'setup your cronjob for cloud backup'"
 
+# method to mount the external drive
+# values: device: mount using the device name
+#         label: mount via the label
+backup_mount_method: device
+
 # user to run the cronjob for
 backup_cronjob_user: root
 
