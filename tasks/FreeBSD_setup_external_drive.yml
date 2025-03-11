@@ -8,21 +8,14 @@
   ansible.builtin.command:
     cmd: "gpart create -s {{ backup_freebsd_disk_scheme }} {{ backup_external_drive[0]['dev_name'] }}"
 
-- name: ensure the remote drive has a partition
+- name: ensure the remote drive has a partition and a label
   when:
     - backup_external_drive_option == true
     - stat_var['stat']['exists'] == false
   args:
     creates: "/dev/{{ backup_external_drive[0]['full_name'] }}"
   ansible.builtin.command:
-    cmd: "gpart add -t {{ backup_external_drive[0]['fstype'] }} {{ backup_external_drive[0]['dev_name'] }}"
-
-- name: ensure the remote drive has a label
-  when:
-    - backup_external_drive_option == true
-    - stat_var['stat']['exists'] == false
-  ansible.builtin.command:
-    cmd: "glabel label {{ backup_external_drive[0]['label'] }} {{ backup_external_drive[0]['full_name'] }}"
+    cmd: "gpart add -t {{ backup_external_drive[0]['fstype'] }} -l {{ backup_external_drive[0]['label'] }} {{ backup_external_drive[0]['dev_name'] }}"
 
 - name: ensure the remote drive has a filesystem
   when:

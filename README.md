@@ -52,6 +52,7 @@ backup_external_drive:
   - dev_name: /dev/<device>
     size: 1G
     fstype: xfs
+    mount_fstype: xfs
     mount_point: /mnt/backup
     full_name: /dev/<device><partition>
     label: <label>
