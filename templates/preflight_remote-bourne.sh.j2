@@ -78,7 +78,7 @@ SUFFICIENT_SPACE=1
 if [ $SUFFICIENT_SPACE -eq 1 ] && [ $VIRUS_STAT == "CLEAN" ]; then
 {% if item['file_copy'] == true -%}
 
-	FILE_SIZE=$(stat -c %s {{ item['file_path'] }})
+	FILE_SIZE=$(stat -f %z {{ item['file_path'] }})
 	SPACE_NEEDED=$(expr $SPACE_NEEDED + $FILE_SIZE)
 {% else -%}
 
