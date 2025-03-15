@@ -89,6 +89,7 @@
 - name: ensure the cloud backup cronjob exists
   when:
     - backup_cloud_backup_option == true
+  tags: backup
   ansible.builtin.cron:
     user: "{{ backup_cronjob_user }}"
     cron_file: "{{ backup_cloud_backup_cronjob_name }}"
@@ -99,4 +100,14 @@
     day: "{{ backup_cloud_backup_kickoff_time_day }}"
     month: "{{ backup_cloud_backup_kickoff_time_month }}"
     weekday: "{{ backup_cloud_backup_kickoff_time_weekday }}"
+    state: present
+
+- name: ensure the external backup script exists
+  tags: backup
+  loop:
+    "{{ backup_external_drive_scripts }}"
+  ansible.builtin.template:
+    src: "{{ item['template_name'] }}"
+    dest: "{{ backup_script_directory }}/{{ item['script_name'] }}"
+    mode: '0770'
     state: present

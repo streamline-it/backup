@@ -2,14 +2,17 @@
 # tasks file for backup
 
 - name: include os specific variables
+  tags: backup
   include_vars: "{{ ansible_os_family }}_script_vars.yml"
-
+ 
 - name: call task to ensure the backup host is configured
   when:
     - backup_operation == 'h'
+  tags: backup
   ansible.builtin.include_tasks: configure_backup_host.yml
 
 - name: call task to ensure the remote host is configured
   when:
     - backup_operation == 'r'
+  tags: backup
   ansible.builtin.include_tasks: configure_remote_host.yml

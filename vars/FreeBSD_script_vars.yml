@@ -1,8 +1,14 @@
 ---
 
-# bacckup scripts
+# backup scripts
 backup_scripts:
   - template_name: BackupData-bourne.sh.j2
     script_name: BackupData.sh
   - template_name: preflight_remote-bourne.sh.j2
     script_name: preflight_remote.sh
+
+backup_external_drive_scripts:
+  - template_name: BackupData-external_drive_-bourne.sh.j2
+    script_name: BackupData-external_drive.sh
+  - template_name: preflight_external_drive-bourne.sh.j2
+    script_name: preflight_external_drive-remote.sh

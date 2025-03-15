@@ -20,10 +20,12 @@
 
 - name: ensure tarexludeddirectories file exists
   ansible.builtin.copy:
+  tags: backup
     src: tarexcludeddirectories
     dest: "{{ backup_script_directory }}/tarexcludeddirectories"
 
 - name: ensure backup scripts exists
+  tags: backup
   loop:
     "{{ backup_scripts }}"
   ansible.builtin.template:
@@ -33,11 +35,13 @@
     mode: "0770"
 
 - name: ensure backup mount directory(s) exists
+  tags: backup
   ansible.builtin.file:
     path: "{{ backup_mount_point }}"
     state: directory
 
 - name: ensure backup mount(s) exists in fstab
+  tags: backup
   ansible.builtin.mount:
     src: "{{ backup_locations_to_backup[0]['remote_path'] }}"
     path: "{{ backup_mount_point }}"
