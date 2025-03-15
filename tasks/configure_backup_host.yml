@@ -13,6 +13,7 @@
   ansible.builtin.file:
     path: "{{ backup_script_directory }}"
     mode: "0770"
+    state: directory
     
 - name: ensure the log file exists
   ansible.builtin.copy:
