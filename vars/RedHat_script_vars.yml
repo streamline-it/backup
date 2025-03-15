@@ -10,5 +10,5 @@ backup_scripts:
 backup_external_drive_scripts:
   - template_name: BackupData-external_drive-bash.sh.j2
     script_name: BackupData.sh
-  - template_name: preflight_external_drive-bash-shell.sh.j2
+  - template_name: preflight_external_drive-bash.sh.j2
     script_name: preflight_external_drive.sh
