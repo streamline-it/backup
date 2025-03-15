@@ -23,8 +23,8 @@
     dest: "{{ backup_script_directory }}/virus_scan_status.txt"
 
 - name: ensure tarexludeddirectories file exists
-  ansible.builtin.copy:
   tags: backup
+  ansible.builtin.copy:
     src: tarexcludeddirectories
     dest: "{{ backup_script_directory }}/tarexcludeddirectories"
 
