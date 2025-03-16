@@ -19,11 +19,13 @@
   ansible.builtin.copy:
     content: ""
     dest: "{{ backup_logfile_path }}"
+    force: false
 
 - name: ensure the backup queue file exists
   ansible.builtin.copy:
     content: ""
     dest: "{{ backup_queue_filepath }}"
+    force: false
 
 - name: check to see of the remote drive has been partitioned
   when: 
