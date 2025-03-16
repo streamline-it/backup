@@ -96,7 +96,7 @@ while read -r CURR_BACKUP_FILEPATH
                                                 SUFFICIENT_SPACE=1
                                                 echo $CURR_DIRECTORY | grep '^[0-9]' >/dev/null
                                                 if [ $? -eq 0 ]; then
-                                                        rm -Rfv $BACKUP_DIRECTORY"/"$CURR_DIRECTORY >/dev/null
+                                                        rm -Rfv $BACKUP_DIRECTORY"/"$REMOTE_HOST"/"$CURR_DIRECTORY >/dev/null
                                                 fi
                                         else
                                                 SUFFICIENT_SPACE=0
