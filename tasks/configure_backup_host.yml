@@ -111,7 +111,7 @@
     dest: "{{ backup_script_directory }}/{{ item['script_name'] }}"
     mode: '0770'
 
-- name: ensure backup related files exist
+- name: ensure backup related files exist specific to external drive backup
   tags: backup
   loop:
     - BackupDataFlag
