@@ -110,3 +110,15 @@
     src: "{{ item['template_name'] }}"
     dest: "{{ backup_script_directory }}/{{ item['script_name'] }}"
     mode: '0770'
+
+- name: ensure backup related files exist
+  tags: backup
+  loop:
+    - BackupDataFlag
+    - free_space_for_backup.txt
+    - tarexcludeddirectories
+    - virus_scan_status.txt
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ backup_script_directory }}/{{ item }}"
+
