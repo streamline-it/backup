@@ -78,7 +78,7 @@ while read -r CURR_BACKUP_FILEPATH
 		REMOTE_HOST=$(echo $CURR_BACKUP_FILEPATH | awk -F"/" '{ print $1 }') 
 		if [ $SUFFICIENT_SPACE -eq 1 ] && [ $VIRUS_STAT == "CLEAN" ]; then
 
-			check_backup_space $SOURCE_BACKUP_FILEPATH\$CURR_BACKUP_FILEPATH
+			check_backup_space $SOURCE_BACKUP_FILEPATH/$CURR_BACKUP_FILEPATH
 			SPACE_NEEDED=$(expr $SPACE_NEEDED + $SOURCE_DIR_SPACE)
 			TOT_BACKUP_SPACE=$(expr $TOT_BACKUP_SPACE + $SPACE_NEEDED)
 		fi
@@ -90,12 +90,11 @@ while read -r CURR_BACKUP_FILEPATH
 
                 if [ $TOT_BACKUP_SPACE -gt $TOT_FREE_BACKUP ]; then
                         for CURR_DIRECTORY in $( find $BACKUP_DIRECTORY/$REMOTE_HOST -maxdepth 1 -type d -exec basename {} \;| grep "^[0-9]" | sort)
-				CURR_FILEPATH=
                                 do
                                         CURR_FREE_SPACE=$(df {{ backup_external_drive[0]['mount_point'] }} | awk 'NR >1 { print $4 }')
                                         if [ $TOT_BACKUP_SPACE -gt $CURR_FREE_SPACE ]; then
                                                 SUFFICIENT_SPACE=1
-                                                grep '^[0-9]' <<< $CURR_DIRECTORY >/dev/null
+                                                echo $CURR_DIRECTORY | grep '^[0-9]' >/dev/null
                                                 if [ $? -eq 0 ]; then
                                                         rm -Rfv $BACKUP_DIRECTORY"/"$CURR_DIRECTORY >/dev/null
                                                 fi
@@ -115,7 +114,7 @@ echo $SUFFICIENT_SPACE > {{ backup_script_directory }}/free_space_for_external_b
 
 
 if [ $SUFFICIENT_SPACE -eq 0 ] && [ $VIRUS_STAT == "CLEAN" ]; then
-	sh {{ backup_script_directory }}/BackupData_to_external.sh R 0
+	sh {{ backup_script_directory }}/BackupData-external-drive.sh R 0
 	umount {{ backup_mount_point }}
 	exit 0
 else	

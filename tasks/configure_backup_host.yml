@@ -121,4 +121,4 @@
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ backup_script_directory }}/{{ item }}"
-
+    force: false
