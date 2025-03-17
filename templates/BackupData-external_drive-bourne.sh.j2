@@ -28,7 +28,7 @@ if [ $SHOW_STOPPER -eq 1 ]; then
 	# NO ISSUES MOUNTING THE DRIVE; CONTINUE
 	while read -r QUEUED_BACKUP
 		do
-			rsyc -a $BACKUP_SOURCE/$QUEUED_BACKUP $BACKUP_LOCATION/$QUEUED_BACKUP 		
+			rsync -a $BACKUP_SOURCE/$QUEUED_BACKUP $BACKUP_LOCATION/$QUEUED_BACKUP 		
 		done < {{ backup_queue_filepath }}
 	
 	# zero the backup queue file

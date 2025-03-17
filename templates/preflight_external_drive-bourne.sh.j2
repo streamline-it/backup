@@ -93,8 +93,9 @@ echo $SUFFICIENT_SPACE > {{ backup_script_directory }}/free_space_for_external_b
 
 
 if [ $SUFFICIENT_SPACE -eq 0 ] && [ $VIRUS_STAT == "CLEAN" ]; then
-	sh {{ backup_script_directory }}/BackupData-external-drive.sh R 0
 	umount {{ backup_mount_point }}
+	sleep 2
+	sh {{ backup_script_directory }}/BackupData-external-drive.sh
 	exit 0
 else	
 	umount {{ backup_mount_point }}
