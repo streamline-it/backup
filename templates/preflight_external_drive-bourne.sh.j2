@@ -9,31 +9,10 @@ check_backup_space() {
 
 	BACKUP_DATA_FLAG_PATH="{{ backup_script_directory }}/BackupDataFlag"
 	FREE_BACKUP_SPACE=$(df {{ backup_mount_point }} | awk 'NR >1 { print $4 }')
-	BACKUP_TYPE=$(cat $BACKUP_DATA_FLAG_PATH)
 	BACKUP_SOURCE="$1"
 
-       # Check to see if it's the first of a month.  If so change the backup type to full.  I need to make sure we get at least one complete backup a month
 
-        DAY_OF_MONTH=$(date | awk '{ print $3 }')
-
-        if [ $DAY_OF_MONTH -eq 1 ]; then
-		echo "A" > $BACKUP_DATA_FLAG_PATH
-	fi
-
-	if [ $BACKUP_TYPE == "E" ]; then
-		CURR_FILTER=""
-		{%- for item2 in backup_exclude_directories %}
-			CURR_FILTER="${CURR_FILTER} -I {{ item2['path'] }} "
-		
-		{%- endfor %}
-
-		# Excluding static data (pics, videos, archives
-		#
-		SOURCE_DIR_SPACE=$(du -s $CURR_FILTER $BACKUP_SOURCE | awk '{ print $1 }')
-	else
-		# Backup everything
-		SOURCE_DIR_SPACE=$(du -s $BACKUP_SOURCE | awk ' { print $1 }')
-	fi
+	SOURCE_DIR_SPACE=$(du -s $BACKUP_SOURCE | awk ' { print $1 }')
 	
 	if [ $FREE_BACKUP_SPACE -gt $SOURCE_DIR_SPACE ]; then
 		SUFFICIENT_SPACE=0

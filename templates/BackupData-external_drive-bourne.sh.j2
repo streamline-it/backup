@@ -7,123 +7,37 @@
 #jinja2: trim_blocks:False
 #!/bin/sh
 
-# This will backup data to another drive then if
-# the external drive is present it will
-# bbackup files to an external drive in an archive format.
-# A new directory will be created by date and the files will be
-# created under it
-
-# Read the contents of the BackupDataFlag file into a variable.  This
-# controls what type of backup will be done.   
-# A-All directories
-# E-Exclude picture and video  directories
-
-# Make Sure the Backup flag file exists.  If so retrieve Backup type
-# from it
-
-# ***********************************************************************
-#                     Managed by Ansible
-# ***********************************************************************
-
-OK_TO_PROCEED=$(cat /root/scripts/backup/free_space_for_backup.txt)
-BACKUP_TARGET=$1
-
-# make sure to uncomment following line
-
-BackupLocation={{ backup_mount_point }}/{{ backup_remote_hostname }}
+# This will backup data to another drive 
 
 
-if [ $OK_TO_PROCEED -eq 1 ]; then
-	echo "No Space Left on backup source." >&2
-	exit 1
+BACKUP_LOCATION={{ backup_mount_point }}
+BACKUP_SOURCE={{ backup_directory['dir_name'] }}
+
+
+mount {{ backup_external_drive[0]['mount_point'] }}
+
+if [ $? -eq 0 ]; then
+	# NO PROBLEMS MOUNTING THE DRIVE
+	SHOW_STOPPER=1
+else
+	# ISSUE MOUNTING THE EXTERNAL DRIVE; ABORT
+	SHOW_STOPPER=0
 fi
 
-if [ -f /root/scripts/backup/BackupDataFlag ]; then
-        SHOW_STOPPER_ERROR=0
-	BACKUP_DATA_FLAG=$(cat /root/scripts/backup/BackupDataFlag)
-else
-	echo 'The BackupDataFlag file does not exist.  Backup cancelled.'
-	SHOW_STOPPER_ERROR=1
-        exit $SHOW_STOPPER_ERROR
-	BACKUP_DATA_FLAG=''
-fi
-
-# Data flag tells us to backup everything or exclude picture directories
-# Don't use verbosity option.  It can cause issues when run from
-# cron where it truncates the archive prematurely
-# No longer using compression due to reliability.  If a portion of the
-# media the archive sits on is corrupted with compression I lose the
-# entire archive.  Without compression I lose the files sitting on 
-# the area that is corrupted.
-
-TODAYS_DATE=$(date +%F)
-TIME_STARTED=$(date +%H)":"$(date +%M)":"$(date +%S)
-BACKUP_TYPE_MSG="Remote Backup" 
-
-echo "($BACKUP_TYPE_MSG) Started: $TODAYS_DATE $TIME_STARTED" >> /root/scripts/backup/BackupData.log
-
-
-{%- for item in backup_locations_to_backup %} 
-{%- if item['file_copy'] == false %}
-
-mkdir -p $BackupLocation/$TODAYS_DATE{{ item['source_path'] }}
-
-{%- endif %}
-{%- endfor %}
-
-
-if [ $BACKUP_DATA_FLAG == 'A' ]; then
-	echo Backing up everything....
-	{%- for item in backup_locations_to_backup %}
-	{%- if item['enabled'] == true %}
-		{%- if item['file_copy'] == false %}
-
-	{{ item['backup_cmd'] }} {{ item['source_path'] }} $BackupLocation/$TODAYS_DATE{{ item['source_path'] }}/
-		{%- else %}
-
-	{{ item['backup_cmd'] }}{{ item['file_path'] }} $BackupLocation/$TODAYS_DATE/
-		{%- endif %}
-	{%- endif %}
-	{%- endfor %}
-
-else
-	{%- for item in backup_locations_to_backup %}
-	{%- if item['enabled'] == true  %}
-		{%- if item['file_copy'] == false %}
+if [ $SHOW_STOPPER -eq 1 ]; then
+	# NO ISSUES MOUNTING THE DRIVE; CONTINUE
+	while read -r QUEUED_BACKUP
+		do
+			rsyc -a $BACKUP_SOURCE/$QUEUED_BACKUP $BACKUP_LOCATION/$QUEUED_BACKUP 		
+		done < {{ backup_queue_filepath }}
 	
-	{{ item['backup_cmd'] }} {{ item['exclude_filter'] }} {{ item['source_path'] }} $BackupLocation/$TODAYS_DATE{{ item['source_path'] }}/
-		{%- else %}
-
-	{{ item['backup_cmd'] }}{{ item['file_path'] }} $BackupLocation/$TODAYS_DATE/
-	{%- endif %}
-	{%- endif %}
-	{%- endfor %}
+	# zero the backup queue file
+	echo "" > {{ backup_queue_filepath }}
+	unmount {{ backup_external_drive[0]['mount_point'] }}
+	RETURN_VAL=0
+else
+	RETURN_VAL=1
 
 fi
 
-# We are always going to perform the following sync which excludes videos and pics to Amazon S3
-
-# The following aws backup excludes videos
-
-#/usr/local/bin/aws s3 sync /home/ s3://data-variable/home/ --exclude "/home/smb/videos/*" --exclude "/home/smb/pics/*" --exclude "/home/smb/.priv/videos/*" --exclude "/home/smb/.priv/pics/*" >/var/log/aws-s3-$(date +%F)
-
-
-# following aws backup will backup everything under /home ^^ Active aws sync below 2022/09/28
-#/root/.local/bin/aws s3 sync /home/ s3://data-variable/home/ 
-
-# create a file containing installed packages
-
-# If we just finished a complete backup, reset backup flag to exclude 
-# pictures and videos from subsequent backups
-
-if [ $SHOW_STOPPER_ERROR -eq 0 ]; then
-	TIME_ENDED=$(date +%H)":"$(date +%M)":"$(date +%S)
-	echo "($BACKUP_TYPE_MSG) Completed:" $(date +%F)" "$TIME_ENDED >> /root/scripts/backup/BackupData.log
-	# Only reset Backup flag if performing remote backup, don't want to reset this during the local otherwise the remote
-	# won't backup all the data neeed for a full backup
-	if [ $BACKUP_DATA_FLAG == 'A' ] && [ $BACKUP_TARGET == 'R' ]; then
-		echo Resetting Backup Flag to exclude pics and videos
-		echo "E" > /root/scripts/backup/BackupDataFlag
-	fi
-fi
-
+exit $RETURN_VAL
