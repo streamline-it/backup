@@ -68,7 +68,7 @@ backup_external_drive_kickoff_time_day: '*'
 backup_external_drive_kickoff_time_month: '*'
 backup_external_drive_kickoff_time_weekday: '0-7'
 backup_external_drive_cronjob_name: ext_drive_backup
-backup_external_drive_cronjob_job: "echo 'setup your cronjob for external drive backup'"
+backup_external_drive_cronjob_job: "{{  backup_script_directory }}/{{ backup_external_drive_scripts[1]['script_name']}}"
 
 
 # Below are the cronjob variables a cronjob for the backup host specific to the cloud option
