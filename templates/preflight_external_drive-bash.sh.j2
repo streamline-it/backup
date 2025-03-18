@@ -5,24 +5,9 @@ function check_backup_space() {
 
 	BACKUP_DATA_FLAG_PATH="{{ backup_script_directory }}/BackupDataFlag"
 	FREE_BACKUP_SPACE=$(df {{ backup_mount_point }} | awk 'NR >1 { print $4 }')
-	BACKUP_TYPE=$(cat $BACKUP_DATA_FLAG_PATH)
 	BACKUP_SOURCE="$1"
 
-       # Check to see if it's the first of a month.  If so change the backup type to full.  I need to make sure we get at least one complete backup a month
-
-        DAY_OF_MONTH=$(date | awk '{ print $3 }')
-
-        if [ $DAY_OF_MONTH -eq 1 ]; then
-		echo "A" > $BACKUP_DATA_FLAG_PATH
-	fi
-
-	if [ $BACKUP_TYPE == "E" ]; then
-		# Excluding static data (pics, videos, archives
-		SOURCE_DIR_SPACE=$(du -s --exclude-from=tarexcludeddirectories $BACKUP_SOURCE | awk '{ print $1 }')
-	else
-		# Backup everything
-		SOURCE_DIR_SPACE=$(du -s $BACKUP_SOURCE | awk ' { print $1 }')
-	fi
+	SOURCE_DIR_SPACE=$(du -s $BACKUP_SOURCE | awk ' { print $1 }')
 	
 	if [ $FREE_BACKUP_SPACE -gt $SOURCE_DIR_SPACE ]; then
 		SUFFICIENT_SPACE=0
@@ -40,10 +25,11 @@ function check_backup_space() {
 #*****************************************************************************************
 
 SUFFICIENT_SPACE=1
-BACKUP_DIRECTORY_BASE_FILEPATH=/exp/nfs/priv/backups
+BACKUP_DIRECTORY={{ backup_external_drive[0]['mount_point'] }}
 VIRUS_STAT=""
 TOT_BACKUP_SPACE=0
 QUEUE_FILE_PATH={{ backup_queue_filepath }}
+SOURCE_BACKUP_FILEPATH={{ backup_directory['dir_name'] }}
 
 # mount backup drive
 
@@ -64,9 +50,9 @@ while read -r CURR_BACKUP_FILEPATH
 
 
 		SUFFICIENT_SPACE=1
-		BACKUP_DIRECTORY=$BACKUP_DIRECTORY_BASE_FILEPATH/$CURR_BACKUP_FILEPATH
+		REMOTE_HOST=$(awk -F"/" '{ print $1 }'<<< $CURR_BACKUP_FILEPATH)
 		if [ $SUFFICIENT_SPACE -eq 1 ] && [ $VIRUS_STAT == "CLEAN" ]; then
-			check_backup_space $BACKUP_DIRECTORY
+			check_backup_space $SOURCE_BACKUP_FILEPATH/$CURR_BACKUP_FILEPATH
 			SPACE_NEEDED=$[ $SPACE_NEEDED + $SOURCE_DIR_SPACE ]
 			TOT_BACKUP_SPACE=$[ $TOT_BACKUP_SPACE+$SPACE_NEEDED ]
 		fi
@@ -76,34 +62,35 @@ while read -r CURR_BACKUP_FILEPATH
 		TOT_FREE_BACKUP=$(df {{ backup_external_drive[0]['mount_point'] }} | awk 'NR >1 { print $4 }')
 
 		if [ $TOT_BACKUP_SPACE -gt $TOT_FREE_BACKUP ]; then
-			for CURR_DIRECTORY in $( find $BACKUP_DIRECTORY -maxdepth 1 -type d -exec basename {} \;| grep "^[0-9]" | sort)
+			for CURR_DIRECTORY in $( find $BACKUP_DIRECTORY/$REMOTE_HOST -maxdepth 1 -type d -exec basename {} \;| grep "^[0-9]" | sort)
 				do
 					CURR_FREE_SPACE=$(df {{ backup_external_drive[0]['mount_point'] }} | awk 'NR >1 { print $4 }')
 					if [ $TOT_BACKUP_SPACE -gt $CURR_FREE_SPACE ]; then
 						SUFFICIENT_SPACE=1
 						grep '^[0-9]' <<< $CURR_DIRECTORY >/dev/null
 						if [ $? -eq 0 ]; then
-							rm -Rfv $BACKUP_DIRECTORY"/"$CURR_DIRECTORY >/dev/null
+							rm -Rfv $BACKUP_DIRECTORY"/"$REMOTE_HOST"/"$CURR_DIRECTORY >/dev/null
 						fi
 					else
 						SUFFICIENT_SPACE=0
 						break
 					fi
-	done
-fi
+				done
+		fi
+	done < $QUEUE_FILE_PATH
 
 
 
 echo $SUFFICIENT_SPACE > {{ backup_script_directory }}/free_space_for_backup.txt
 
-done < $QUEUE_FILEPATH
 
 # if we have enough space for the backup and it's virus free, run the backup
 
 
 if [ $SUFFICIENT_SPACE -eq 0 ] && [ $VIRUS_STAT == "CLEAN" ]; then
-	bash {{ backup_script_directory }}/BackupData_to_external.sh R 0
-	umount {{ backup_mount_point }}
+	unmount {{ backup_mount_point }}
+	sleep 2
+	bash {{ backup_script_directory }}/BackupData_to_external.sh
 	exit 0
 else	
 	umount {{ backup_mount_point }}
