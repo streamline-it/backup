@@ -92,7 +92,7 @@ echo $SUFFICIENT_SPACE > {{ backup_script_directory }}/free_space_for_backup.txt
 if [ $SUFFICIENT_SPACE -eq 0 ] && [ $VIRUS_STAT == "CLEAN" ]; then
 	unmount {{ backup_mount_point }}
 	sleep 2
-	bash {{ backup_script_directory }}/BackupData_to_external.sh
+	bash {{ backup_script_directory }}/BackupData_external.sh
 	exit 0
 else	
 	umount {{ backup_mount_point }}
