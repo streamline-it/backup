@@ -17,7 +17,7 @@ else
 	SHOW_STOPPER=0
 fi
 
-if [ $SHOW_STOPPER_ERROR -eq 1 ]; then
+if [ $SHOW_STOPPER -eq 1 ]; then
 	# NO ISSUES MOUNTING THE DRIVE; CONTINUE
 	while read -r QUEUED_BACKUP
 		do
@@ -25,7 +25,7 @@ if [ $SHOW_STOPPER_ERROR -eq 1 ]; then
 		done < {{ backup_queue_filepath }}
 	# zero the backup queue file
 	echo "" > {{ backup_queue_filepath }}
-	unmount {{ backup_external_drive[0]['mount_point'] }}
+	umount {{ backup_external_drive[0]['mount_point'] }}
 	RETURN_VAL=0
 else
 	RETURN_VAL=1
