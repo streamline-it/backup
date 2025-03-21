@@ -76,6 +76,8 @@ while read -r CURR_BACKUP_FILEPATH
 						break
 					fi
 				done
+		else
+			SUFFICIENT_SPACE=0
 		fi
 	done < $QUEUE_FILE_PATH
 
