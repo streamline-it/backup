@@ -11,6 +11,8 @@
     state: present
 
 - name: ensure prior OS is cleared from external drive
+  args:
+    creates: "{{ backup_external_drive[0]['full_name ] }}"
   ansible.builtin.command:
     cmd: "wipefs -af {{ backup_external_drive[0]['dev_name'] }}"
 
