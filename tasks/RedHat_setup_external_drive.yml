@@ -10,6 +10,10 @@
     part_end: "{{ backup_external_drive[0]['size'] }}"
     state: present
 
+- name: ensure prior OS is cleared from external drive
+  ansible.builtin.command:
+    cmd: "wipefs -af {{ backup_external_drive[0]['dev_name'] }}"
+
 - name: ensure the remote drive has a filesystem
   when:
     - backup_external_drive_option == true
@@ -18,4 +22,3 @@
     dev: "{{ backup_external_drive[0]['dev_name'] }}1"
     fstype: "{{ backup_external_drive[0]['fstype'] }}"
     state: present
-
