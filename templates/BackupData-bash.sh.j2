@@ -115,8 +115,8 @@ fi
 if [ $SHOW_STOPPER_ERROR -eq 0 ]; then
 	TIME_ENDED=$(date +%H)":"$(date +%M)":"$(date +%S)
 	echo "($BACKUP_TYPE_MSG) Completed:" $(date +%F)" "$TIME_ENDED >> /root/scripts/backup/BackupData.log
-	echo "($BACKUP_TYPE_MSG) Completed for" {{ backup_remote_hostname }} on $(date +%F) >> 
-	echo "{{ backup_remote_hostname }}/" $(date +%F) > {{ backup_queue_filepath }}
+	echo "($BACKUP_TYPE_MSG) Completed for" {{ backup_remote_hostname }} on $(date +%F) >> $BackupLocation/{{ backup_logfile_name }}
+	echo "{{ backup_remote_hostname }}/" $(date +%F) > $BackupLocation/{{ backup_queue_name }}
 	# Only reset Backup flag if performing remote backup, don't want to reset this during the local otherwise the remote
 	# won't backup all the data neeed for a full backup
 	if [ $BACKUP_DATA_FLAG == 'A' ] && [ $BACKUP_TARGET == 'R' ]; then
