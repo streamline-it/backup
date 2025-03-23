@@ -21,7 +21,9 @@ if [ $SHOW_STOPPER -eq 1 ]; then
 	# NO ISSUES MOUNTING THE DRIVE; CONTINUE
 	while read -r QUEUED_BACKUP
 		do
-			rsync -a $BACKUP_SOURCE/$QUEUED_BACKUP $BACKUP_LOCATION/$QUEUED_BACKUP
+			BACKUP_REMOTE_HOST=$(gawk -F '/' '{ print $1 }' <<< $QUEUE_BACKUP)
+			BACKUP_DATE=$(gawk -F '/' '{ print $2 }' <<< $QUEUE_BACKUP)
+			rsync -a $BACKUP_SOURCE/$BACKUP_REMOTE_HOST/$BACKUP_REMOTE_DATE $BACKUP_LOCATION/$BACKUP_REMOTE_HOST
 		done < {{ backup_queue_filepath }}
 	# zero the backup queue file
 	echo "" > {{ backup_queue_filepath }}
