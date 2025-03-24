@@ -56,7 +56,7 @@
 
 - name: ensure host has backup cronjob enabled
   ansible.builtin.cron:
-    user: "{{ backup_cronjob_user_}}"
+    user: "{{ backup_cronjob_user }}"
     cron_file: "{{ backup_remote_host_backup_kickoff_cronjob_name }}"
     name: "{{ backup_remote_host_backup_kickoff_cronjob_name }}"
     job: "{{ backup_remote_host_backup_kickoff_cronjob_job }}"
