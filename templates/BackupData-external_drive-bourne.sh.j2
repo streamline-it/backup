@@ -35,7 +35,7 @@ if [ $SHOW_STOPPER -eq 1 ]; then
 	
 	# zero the backup queue file
 	echo "" > {{ backup_queue_filepath }}
-	unmount {{ backup_external_drive[0]['mount_point'] }}
+	umount {{ backup_external_drive[0]['mount_point'] }}
 	RETURN_VAL=0
 else
 	RETURN_VAL=1
