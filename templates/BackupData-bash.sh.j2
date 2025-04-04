@@ -54,48 +54,50 @@ fi
 
 TODAYS_DATE=$(date +%F)
 TIME_STARTED=$(date +%H)":"$(date +%M)":"$(date +%S)
+DAY_OF_MONTH=$(gawk -F"-" '{ print $2 }'<<<$TIME_STARTED)
 BACKUP_TYPE_MSG="Remote Backup" 
 
 echo "($BACKUP_TYPE_MSG) Started: $TODAYS_DATE $TIME_STARTED" >> /root/scripts/backup/BackupData.log
 
 
+if [ $DAY_OF_MONTH -eq "01" ]; then
+	BACKUP_DIRECTORY="full"
+else
+	BACKUP_DIRECTORY=$TODAYS_DATE
+fi
+
 {%- for item in backup_locations_to_backup %} 
 {%- if item['file_copy'] == false %}
 
-mkdir -p $BackupLocation/$TODAYS_DATE{{ item['source_path'] }}
+# Create a directory if it's a partial backup type or if it's a full backup AND it's the first day of the month
+if [ {{ item['type'] }} == 'partial' ] || ( {{ item['type'] }} == "full" && $DAY_OF_MONTH == "01" ] ); then
+	if [ ! -f $BackupLocation/$BACKUP_DIRECTORY{{ item['source_path'] }} ]; then
+		mkdir -p $BackupLocation/$TODAYS_DATE{{ item['source_path'] }}	
+	fi
+
+fi
 
 {%- endif %}
 {%- endfor %}
 
 
-if [ $BACKUP_DATA_FLAG == 'A' ]; then
-	echo Backing up everything....
-	{%- for item in backup_locations_to_backup %}
-	{%- if item['enabled'] == true %}
+
+{%- for item in backup_locations_to_backup %}
+{%- if item['enabled'] == true %}
+	if [ {{ item['type'] }} == 'partial' ] || ( {{ item['type'] }} == "full" && $DAY_OF_MONTH == "01" ] ); then
+		#
+		# backup if it's a partial backup, or if it's a full, then it's the first day of the month
+		#
 		{%- if item['file_copy'] == false %}
-
-	{{ item['backup_cmd'] }} {{ item['source_path'] }} $BackupLocation/$TODAYS_DATE{{ item['source_path'] }}/
+		{{ item['backup_cmd'] }} {{ item['source_path'] }} $BackupLocation/$BACKUP_DIRECTORY{{ item['source_path'] }}/
 		{%- else %}
-
-	{{ item['backup_cmd'] }}{{ item['file_path'] }} $BackupLocation/$TODAYS_DATE/
+		{{ item['backup_cmd'] }}{{ item['file_path'] }} $BackupLocation/$BACKUP_DIRECTORY/
 		{%- endif %}
-	{%- endif %}
-	{%- endfor %}
+	fi
+{%- endif %}
+{%- endfor %}
 
-else
-	{%- for item in backup_locations_to_backup %}
-	{%- if item['enabled'] == true  %}
-		{%- if item['file_copy'] == false %}
-	
-	{{ item['backup_cmd'] }} {{ item['exclude_filter'] }} {{ item['source_path'] }} $BackupLocation/$TODAYS_DATE{{ item['source_path'] }}/
-		{%- else %}
 
-	{{ item['backup_cmd'] }}{{ item['file_path'] }} $BackupLocation/$TODAYS_DATE/
-	{%- endif %}
-	{%- endif %}
-	{%- endfor %}
-
-fi
 
 # We are always going to perform the following sync which excludes videos and pics to Amazon S3
 

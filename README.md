@@ -96,9 +96,11 @@ backup_cronjob_user: root
 # Basically this backup_locations_to_backup dictionary list will be used to create individual rsync or remote commands for the backup
 # script to be run on the remote host.
 
+#Note on attribute (type).  Values are "full" only backup when specifying a full backup or "partial" for abbreviated backups
  
 backup_locations_to_backup:
   - source_path: /home
+    type: <full/partial>
     file_path: ""
     remote_path: /backup
     source_mounted: true
