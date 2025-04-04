@@ -84,8 +84,8 @@ fi
 
 {%- for item in backup_locations_to_backup %}
 {%- if item['enabled'] == true %}
-	CURR_BACKUP_TYPE="{{ item['type'] }}"
-	if [ $CURR_BACKUP_TYPE == 'partial' ] || ( {{ item['type'] }} == "full" && $DAY_OF_MONTH == "01" ] ); then
+	CURR_BACKUP_TYPE={{ item['type'] }}
+	if [ $CURR_BACKUP_TYPE == 'partial' ] || ( $CURR_BACKUP_TYPE == "full" && $DAY_OF_MONTH == "01" ] ); then
 		#
 		# backup if it's a partial backup, or if it's a full, then it's the first day of the month
 		#
