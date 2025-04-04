@@ -100,7 +100,7 @@ backup_cronjob_user: root
  
 backup_locations_to_backup:
   - source_path: /home
-    type: <full/partial>
+    backup_type: <full/partial>
     file_path: ""
     remote_path: /backup
     source_mounted: true
