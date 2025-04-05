@@ -38,7 +38,7 @@ SHOW_STOPPER_ERROR=0
 
 TODAYS_DATE=$(date +%F)
 TIME_STARTED=$(date +%H)":"$(date +%M)":"$(date +%S)
-DAY_OF_MONTH=$( echo $TODAYS_DATE | awk -f'-' '{ print $3 }')
+DAY_OF_MONTH=$( echo $TODAYS_DATE | awk -F'-' '{ print $3 }')
 BACKUP_TYPE_MSG="Remote Backup" 
 
 echo "($BACKUP_TYPE_MSG) Started: $TODAYS_DATE $TIME_STARTED" >> /root/scripts/backup/BackupData.log
