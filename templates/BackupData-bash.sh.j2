@@ -64,7 +64,9 @@ fi
 {%- for item in backup_locations_to_backup %}
 {%- if item['enabled'] == true %}
 
+
 CURR_BACKUP_TYPE="{{ item['backup_type'] }}"
+
 
 if [ $CURR_BACKUP_TYPE == 'partial' ] || ( $CURR_BACKUP_TYPE == "full" && $DAY_OF_MONTH == "01" ] ); then
 	#
@@ -79,6 +81,7 @@ if [ $CURR_BACKUP_TYPE == 'partial' ] || ( $CURR_BACKUP_TYPE == "full" && $DAY_O
 		{{ item['backup_cmd'] }}{{ item['file_path'] }} $BackupLocation/$BACKUP_DIRECTORY/
 
 	{%- endif %}
+
 fi
 
 {%- endif %}
