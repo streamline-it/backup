@@ -44,13 +44,6 @@ else
 	BACKUP_DATA_FLAG=''
 fi
 
-# Data flag tells us to backup everything or exclude picture directories
-# Don't use verbosity option.  It can cause issues when run from
-# cron where it truncates the archive prematurely
-# No longer using compression due to reliability.  If a portion of the
-# media the archive sits on is corrupted with compression I lose the
-# entire archive.  Without compression I lose the files sitting on 
-# the area that is corrupted.
 
 TODAYS_DATE=$(date +%F)
 TIME_STARTED=$(date +%H)":"$(date +%M)":"$(date +%S)
@@ -71,7 +64,7 @@ fi
 
 CURR_BACKUP_TYPE="{{ item['backup_type'] }}"
 # Create a directory if it's a partial backup type or if it's a full backup AND it's the first day of the month
-if [ $CURR_BACKUP_TYPE == 'partial' ] || ( $CURR_BACKUP_TYPE == "full" && $DAY_OF_MONTH == "01" ] ); then
+if [ $CURR_BACKUP_TYPE=='partial' ] || ( $CURR_BACKUP_TYPE=="full" && $DAY_OF_MONTH=="01" ] ); then
 	if [ ! -f $BackupLocation/$BACKUP_DIRECTORY{{ item['source_path'] }} ]; then
 		mkdir -p $BackupLocation/$BACKUP_DIRECTORY{{ item['source_path'] }}	
 	fi
@@ -86,7 +79,7 @@ fi
 {%- for item in backup_locations_to_backup %}
 {%- if item['enabled'] == true %}
 	CURR_BACKUP_TYPE="{{ item['backup_type'] }}"
-	if [ $CURR_BACKUP_TYPE == 'partial' ] || ( $CURR_BACKUP_TYPE == "full" && $DAY_OF_MONTH == "01" ] ); then
+	if [ $CURR_BACKUP_TYPE=='partial' ] || ( $CURR_BACKUP_TYPE=="full" && $DAY_OF_MONTH=="01" ] ); then
 		#
 		# backup if it's a partial backup, or if it's a full, then it's the first day of the month
 		#
