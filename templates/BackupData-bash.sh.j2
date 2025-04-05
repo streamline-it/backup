@@ -9,13 +9,6 @@
 # A new directory will be created by date and the files will be
 # created under it
 
-# Read the contents of the BackupDataFlag file into a variable.  This
-# controls what type of backup will be done.   
-# A-All directories
-# E-Exclude picture and video  directories
-
-# Make Sure the Backup flag file exists.  If so retrieve Backup type
-# from it
 
 # ***********************************************************************
 #                     Managed by Ansible
@@ -34,15 +27,7 @@ if [ $OK_TO_PROCEED -eq 1 ]; then
 	exit 1
 fi
 
-if [ -f /root/scripts/backup/BackupDataFlag ]; then
-        SHOW_STOPPER_ERROR=0
-	BACKUP_DATA_FLAG=$(cat /root/scripts/backup/BackupDataFlag)
-else
-	echo 'The BackupDataFlag file does not exist.  Backup cancelled.'
-	SHOW_STOPPER_ERROR=1
-        exit $SHOW_STOPPER_ERROR
-	BACKUP_DATA_FLAG=''
-fi
+SHOW_STOPPER_ERROR=0
 
 
 TODAYS_DATE=$(date +%F)
@@ -53,7 +38,7 @@ BACKUP_TYPE_MSG="Remote Backup"
 echo "($BACKUP_TYPE_MSG) Started: $TODAYS_DATE $TIME_STARTED" >> /root/scripts/backup/BackupData.log
 
 
-if [ $DAY_OF_MONTH -eq "01" ]; then
+if [ $DAY_OF_MONTH=="01" ]; then
 	BACKUP_DIRECTORY="full"
 else
 	BACKUP_DIRECTORY=$TODAYS_DATE
@@ -78,15 +63,20 @@ fi
 
 {%- for item in backup_locations_to_backup %}
 {%- if item['enabled'] == true %}
+
 	CURR_BACKUP_TYPE="{{ item['backup_type'] }}"
 	if [ $CURR_BACKUP_TYPE=='partial' ] || ( $CURR_BACKUP_TYPE=="full" && $DAY_OF_MONTH=="01" ] ); then
 		#
 		# backup if it's a partial backup, or if it's a full, then it's the first day of the month
 		#
 		{%- if item['file_copy'] == false %}
+
 		{{ item['backup_cmd'] }} {{ item['source_path'] }} $BackupLocation/$BACKUP_DIRECTORY{{ item['source_path'] }}/
+
 		{%- else %}
+
 		{{ item['backup_cmd'] }}{{ item['file_path'] }} $BackupLocation/$BACKUP_DIRECTORY/
+
 		{%- endif %}
 	fi
 {%- endif %}
