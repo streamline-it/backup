@@ -75,7 +75,7 @@ if [ $CURR_BACKUP_TYPE == 'partial' ] || ( [ $CURR_BACKUP_TYPE == "full" ] && [ 
 	#
 	# backup if it's a partial backup, or if it's a full, then it's the first day of the month
 	#
-	# Backup {{ item'['source_path'] }}
+	# Backup {{ item['source_path'] }}
 	#
 	
 	{%- if item['file_copy'] == false %}
