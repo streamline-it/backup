@@ -1,6 +1,57 @@
 ---
 # tasks file for backup
 
+- name: ensure needed variables are defined
+  ansible.builtin.assert:
+    that:
+      - backup_directory is defined
+      - backup_script_directory is defined
+      - backup_logfile_path is defined
+      - backup_script_directory is defined
+      - backup_queue_name is defined
+      - backup_queue_filepath is defined
+      - backup_external_drive_option is defined
+      - backup_mount_point is defined
+      - backup_external_drive is defined
+      - backup_mount_method is defined
+      - backup_cronjob_user is defined
+      - backup_external_drive_cronjob_name is defined
+      - backup_external_drive_cronjob_job is defined
+      - backup_external_drive_kickoff_time_minute is defined
+      - backup_external_drive_kickoff_time_hour is defined
+      - backup_external_drive_kickoff_time_day is defined
+      - backup_external_drive_kickoff_time_month is defined
+      - backup_external_drive_kickoff_time_weekday is defined
+    fail_msg: >
+      "Make sure following variables are defined (backup_directory,
+      backup_script_directory,backup_logfile_path,backup_script_directory,
+      backup_queue_name,backup_queue_filepath,backup_external_drive_option,
+      backup_mount_point,backup_external_drive,backup_mount_method,
+      backup_cronjob_user,backup_external_drive_cronjob_name,
+      backup_external_drive_cronjob_job,backup_external_drive_time_minute
+      backup_external_drive_time_hour,backup_external_drive_time_day
+      backup_external_drive_time_month,backup_external_drive_time_weekday)"
+
+- name: ensure these variables are defined too
+  ansible.builtin.assert:
+    that:
+      - backup_cronjob_user is defined
+      - backup_cloud_backup_cronjob_name is defined 
+      - backup_cloud_backup_cronjob_job is defined
+      - backup_cloud_backup_kickoff_time_minute is defined
+      - backup_cloud_backup_kickoff_time_hour is defined
+      - backup_cloud_backup_kickoff_time_date is defined
+      - backup_cloud_backup_kickoff_time_month is defined
+      - backup_cloud_backup_kickoff_time_weekday is defined
+    fail_msg: >
+    "Make sure following variables are defined (backup_cronjob_user,
+    backup_cloud_backup_cronjob_name,backup_cloud_backup_cronjob_job,
+    backup_cloud_backup_kickoff_time_minute,
+    backup_cloud_backup_kickoff_time_hour,
+    backup_cloud_backup_kickoff_time_date,
+    backup_cloud_backup_kickoff_time_month,
+    backup_cloud_backup_kickoff_time_weekday)"
+
 - name: ensure the backup folder exists
   tags: backup
   ansible.builtin.file:
@@ -126,10 +177,7 @@
 - name: ensure backup related files exist specific to external drive backup
   tags: backup
   loop:
-    - BackupDataFlag
     - free_space_for_backup.txt
-    - tarexcludeddirectories
-    - virus_scan_status.txt
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ backup_script_directory }}/{{ item }}"

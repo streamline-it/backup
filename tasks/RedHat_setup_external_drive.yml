@@ -1,3 +1,12 @@
+---
+- name: ensure needed variables are defined
+  ansible.builtin.assert:
+    that: 
+      - backup_external_drive_option is defined
+      - backup_external_drive is defined
+    fail_msg: <
+      "Make sure to define the following variables (backup_external_drive_option,
+      backup_external_drive)"
 - name: ensure the remote drive is partitioned
   when:
     - backup_external_drive_option == true

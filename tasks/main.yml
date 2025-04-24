@@ -1,6 +1,11 @@
 ---
 # tasks file for backup
 
+- name: ensure backup_operation is defined
+  ansible.builtin.assert:
+    that: backup_operation is defined
+    fail_msg: "Make sure backup_operation is defined with value of [r - setup remote host or h - setup backup host"
+
 - name: include os specific variables
   tags: backup
   include_vars: "{{ ansible_os_family }}_script_vars.yml"
