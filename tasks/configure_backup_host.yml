@@ -40,17 +40,17 @@
       - backup_cloud_backup_cronjob_job is defined
       - backup_cloud_backup_kickoff_time_minute is defined
       - backup_cloud_backup_kickoff_time_hour is defined
-      - backup_cloud_backup_kickoff_time_date is defined
+      - backup_cloud_backup_kickoff_time_day is defined
       - backup_cloud_backup_kickoff_time_month is defined
       - backup_cloud_backup_kickoff_time_weekday is defined
     fail_msg: >
-    "Make sure following variables are defined (backup_cronjob_user,
-    backup_cloud_backup_cronjob_name,backup_cloud_backup_cronjob_job,
-    backup_cloud_backup_kickoff_time_minute,
-    backup_cloud_backup_kickoff_time_hour,
-    backup_cloud_backup_kickoff_time_date,
-    backup_cloud_backup_kickoff_time_month,
-    backup_cloud_backup_kickoff_time_weekday)"
+      "Make sure following variables are defined (backup_cronjob_user,
+      backup_cloud_backup_cronjob_name,backup_cloud_backup_cronjob_job,
+      backup_cloud_backup_kickoff_time_minute,
+      backup_cloud_backup_kickoff_time_hour,
+      backup_cloud_backup_kickoff_time_day,
+      backup_cloud_backup_kickoff_time_month,
+      backup_cloud_backup_kickoff_time_weekday)"
 
 - name: ensure the backup folder exists
   tags: backup
