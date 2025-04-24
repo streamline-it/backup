@@ -32,7 +32,7 @@
       backup_external_drive_time_hour,backup_external_drive_time_day
       backup_external_drive_time_month,backup_external_drive_time_weekday)"
 
-- name: ensure these variables are defined too
+- name: ensure these variables are defined specific to cloud backup cronjob
   ansible.builtin.assert:
     that:
       - backup_cronjob_user is defined

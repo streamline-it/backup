@@ -62,9 +62,9 @@ backup_external_drive_cronjob_job: "{{ backup_script_directory}}/{{ backup_exter
 # Below are the cronjob variables a cronjob for the backup host specific to the cloud option
 backup_cloud_backup_kickoff_time_hour: 13
 backup_cloud_backup_kickoff_time_minute: 0
-backup_cloud backup_kickoff_time_day: '*'
-backup_cloud backup_kickoff_time_month: '*'
-backup_cloud backup_kickoff_time_weekday: '0-7'
+backup_cloud_backup_kickoff_time_day: '*'
+backup_cloud_backup_kickoff_time_month: '*'
+backup_cloud_backup_kickoff_time_weekday: '0-7'
 backup_cloud_backup_cronjob_name: cloud_backup
 backup_cloud_backup_cronjob_job: "echo 'setup your cronjob for cloud backup'"
 
