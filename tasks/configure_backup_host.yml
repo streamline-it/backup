@@ -58,7 +58,7 @@
     path: "{{ backup_directory['dir_name'] }}"
     owner: "{{ backup_directory['owner'] }}"
     group: "{{ backup_directory['groups'] }}"
-    mode: "0770"
+    mode: "2770"
     state: directory
 
 - name: ensure the scripts directory exists
