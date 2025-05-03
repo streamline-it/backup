@@ -30,6 +30,7 @@ SUFFICIENT_SPACE=1
 BACKUP_DIRECTORY={{ backup_mount_point }}/{{ backup_remote_hostname }}
 TOT_BACKUP_SPACE=0
 SPACE_NEEDED=0
+DAY_OF_MONTH=$(date +%F | awk -F'-' '{ print $2 }')
 
 # mount backup share if necessary
 
@@ -56,7 +57,7 @@ if [ $SUFFICIENT_SPACE -eq 1 ]; then
 	if [ $BACKUP_TYPE == 'partial' ] || ( [ $BACKUP_TYPE == "full" ] && [ $DAY_OF_MONTH == "01" ] ); then 
 		check_backup_space {{ item['source_path'] }} {{ item['backup_type'] }}
 		SPACE_NEEDED=$(expr $SPACE_NEEDED + $SOURCE_DIR_SPACE)
-		$TOT_BACKUP_SPACE=$(expr $TOT_BACKUP_SPACE + $SPACE_NEEDED)
+		TOT_BACKUP_SPACE=$(expr $TOT_BACKUP_SPACE + $SPACE_NEEDED)
 	fi
 {% endif -%}
 fi
@@ -80,6 +81,8 @@ if [ $TOT_BACKUP_SPACE -gt $TOT_FREE_BACKUP ]; then
 				break
 			fi
 		done
+else
+	SUFFICIENT_SPACE=0
 fi
 
 
@@ -90,7 +93,7 @@ echo $SUFFICIENT_SPACE > {{ backup_script_directory }}/free_space_for_backup.txt
 # if we have enough space for the backup and it's virus free, run the backup
 
 
-if [ $SUFFICIENT_SPACE -eq 0 ] && [ $VIRUS_STAT == "CLEAN" ]; then
+if [ $SUFFICIENT_SPACE -eq 0 ]; then
 	sh {{ backup_script_directory }}/BackupData.sh
 	umount {{ backup_mount_point }}
 	exit 0
