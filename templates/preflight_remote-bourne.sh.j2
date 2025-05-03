@@ -7,34 +7,11 @@
 
 check_backup_space() {
 
-	BACKUP_DATA_FLAG_PATH="{{ backup_script_directory }}/BackupDataFlag"
 	FREE_BACKUP_SPACE=$(df {{ backup_mount_point }} | awk 'NR >1 { print $4 }')
-	BACKUP_TYPE=$(cat $BACKUP_DATA_FLAG_PATH)
 	BACKUP_SOURCE="$1"
 
-       # Check to see if it's the first of a month.  If so change the backup type to full.  I need to make sure we get at least one complete backup a month
+	SOURCE_DIR_SPACE=$(du -s $BACKUP_SOURCE | awk ' { print $1 }')
 
-        DAY_OF_MONTH=$(date | awk '{ print $3 }')
-
-        if [ $DAY_OF_MONTH -eq 1 ]; then
-		echo "A" > $BACKUP_DATA_FLAG_PATH
-	fi
-
-	if [ $BACKUP_TYPE == "E" ]; then
-		CURR_FILTER=""
-		{%- for item2 in backup_exclude_directories %}
-			CURR_FILTER="${CURR_FILTER} -I {{ item2['path'] }} "
-		
-		{%- endfor %}
-
-		# Excluding static data (pics, videos, archives
-		#
-		SOURCE_DIR_SPACE=$(du -s $CURR_FILTER $BACKUP_SOURCE | awk '{ print $1 }')
-	else
-		# Backup everything
-		SOURCE_DIR_SPACE=$(du -s $BACKUP_SOURCE | awk ' { print $1 }')
-	fi
-	
 	if [ $FREE_BACKUP_SPACE -gt $SOURCE_DIR_SPACE ]; then
 		SUFFICIENT_SPACE=0
 	else
@@ -51,7 +28,6 @@ check_backup_space() {
 
 SUFFICIENT_SPACE=1
 BACKUP_DIRECTORY={{ backup_mount_point }}/{{ backup_remote_hostname }}
-VIRUS_STAT=""
 TOT_BACKUP_SPACE=0
 SPACE_NEEDED=0
 
@@ -61,12 +37,6 @@ mount {{ backup_mount_point }}
 
 cd {{ backup_script_directory }}
 
-# Make sure the data has no viruses, check that status
-
-if [ -f {{ backup_script_directory }}/virus_scan_status.txt ]; then
-	VIRUS_STAT=$(cat {{ backup_script_directory }}/virus_scan_status.txt)
-fi
-
 {% for item in backup_locations_to_backup -%}
 {% if item['source_mounted'] == true -%}
 
@@ -75,16 +45,19 @@ fi
 
 SUFFICIENT_SPACE=1
 
-if [ $SUFFICIENT_SPACE -eq 1 ] && [ $VIRUS_STAT == "CLEAN" ]; then
+if [ $SUFFICIENT_SPACE -eq 1 ]; then
 {% if item['file_copy'] == true -%}
 
 	FILE_SIZE=$(stat -f %z {{ item['file_path'] }})
 	SPACE_NEEDED=$(expr $SPACE_NEEDED + $FILE_SIZE)
 {% else -%}
 
-	check_backup_space {{ item['source_path'] }}
-	SPACE_NEEDED=$(expr $SPACE_NEEDED + $SOURCE_DIR_SPACE)
-	TOT_BACKUP_SPACE=$(expr $TOT_BACKUP_SPACE + $SPACE_NEEDED)
+	BACKUP_TYPE="{{ item['backup_type'] }}"
+	if [ $BACKUP_TYPE == 'partial' ] || ( [ $BACKUP_TYPE == "full" ] && [ $DAY_OF_MONTH == "01" ] ); then 
+		check_backup_space {{ item['source_path'] }} {{ item['backup_type'] }}
+		SPACE_NEEDED=$(expr $SPACE_NEEDED + $SOURCE_DIR_SPACE)
+		$TOT_BACKUP_SPACE=$(expr $TOT_BACKUP_SPACE + $SPACE_NEEDED)
+	fi
 {% endif -%}
 fi
 
