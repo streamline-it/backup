@@ -114,7 +114,7 @@ if [ $SHOW_STOPPER_ERROR -eq 0 ]; then
 	TIME_ENDED=$(date +%H)":"$(date +%M)":"$(date +%S)
 	echo "($BACKUP_TYPE_MSG) Completed:" $(date +%F)" "$TIME_ENDED >> /root/scripts/backup/BackupData.log
 	echo "($BACKUP_TYPE_MSG) Completed for" {{ backup_remote_hostname }} on $(date +%F) >> {{ backup_mount_point }}/{{ backup_logfile_name }}
-	echo "{{ backup_remote_hostname }}/"$(date +%F) > {{ backup_mount_point }}/{{ backup_queue_name }}
+	echo "{{ backup_remote_hostname }}/"$(date +%F) >> {{ backup_mount_point }}/{{ backup_queue_name }}
 fi
 
 exit $SHOW_STOPPER_ERROR
