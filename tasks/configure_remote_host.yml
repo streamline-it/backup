@@ -1,4 +1,5 @@
 - name: ensure needed variables are defined specific to backup operations
+  tags: backup
   ansible.builtin.assert:
     that:
       - backup_script_directory is defined
@@ -8,6 +9,7 @@
     fail_msg: "Make sure to define the following variables (backup_script_directory, backup_scripts, backup_mount_point, backup_locations_to_backup)."
 
 - name: ensure needed variables are defined specific to the backup cronjob
+  tags: backup
   ansible.builtin.assert:
     that:
       - backup_cronjob_user is defined
@@ -62,6 +64,7 @@
     state: present
 
 - name: ensure host has backup cronjob enabled
+  tags: backup
   ansible.builtin.cron:
     user: "{{ backup_cronjob_user }}"
     cron_file: "{{ backup_remote_host_backup_cronjob_name }}"

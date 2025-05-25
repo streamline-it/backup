@@ -1,5 +1,6 @@
 ---
 - name: ensure needed variables are defined
+  tags: backup
   ansible.builtin.assert:
     that:
       - backup_external_drive_option is defined

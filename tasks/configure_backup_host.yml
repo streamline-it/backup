@@ -2,6 +2,7 @@
 # tasks file for backup
 
 - name: ensure needed variables are defined
+  tags: backup
   ansible.builtin.assert:
     that:
       - backup_directory is defined
@@ -33,6 +34,7 @@
       backup_external_drive_time_month,backup_external_drive_time_weekday)"
 
 - name: ensure these variables are defined specific to cloud backup cronjob
+  tags: backup
   ansible.builtin.assert:
     that:
       - backup_cronjob_user is defined

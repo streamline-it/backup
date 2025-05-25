@@ -2,22 +2,28 @@
 # tasks file for backup
 
 - name: ensure backup_operation is defined
+  tags: backup
   ansible.builtin.assert:
     that: backup_operation is defined
     fail_msg: "Make sure backup_operation is defined with value of [r - setup remote host or h - setup backup host"
+
+# For some reason some hosts fail to see "ansible_os_family" which is why I need to 
+# call the next task
+- name: Not this ensures the next task won't fail when isolating on tags, so do it!
+  ansible.builtin.setup:
 
 - name: include os specific variables
   tags: backup
   include_vars: "{{ ansible_os_family }}_script_vars.yml"
  
 - name: call task to ensure the backup host is configured
+  tags: backup
   when:
     - backup_operation == 'h'
-  tags: backup
   ansible.builtin.include_tasks: configure_backup_host.yml
 
 - name: call task to ensure the remote host is configured
+  tags: backup
   when:
     - backup_operation == 'r'
-  tags: backup
   ansible.builtin.include_tasks: configure_remote_host.yml
