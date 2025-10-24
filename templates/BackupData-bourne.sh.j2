@@ -45,10 +45,10 @@ echo "($BACKUP_TYPE_MSG) Started: $TODAYS_DATE $TIME_STARTED" >> /root/scripts/b
 
 if [ $DAY_OF_MONTH == "01" ]; then
 	BACKUP_DIRECTORY="full"
-	CURR_BACKUP_TYPE="full"
+	BACKUP_SCOPE="full"
 else
 	BACKUP_DIRECTORY=$TODAYS_DATE
-	CURR_BACKUP_TYPE="partial"
+	BACKUP_SCOPE"partial"
 fi
 
 
@@ -58,7 +58,7 @@ fi
 
 CURR_BACKUP_TYPE="{{ item['backup_type'] }}"
 # Create a directory if it's a partial backup type or if it's a full backup AND it's the first day of the month
-if [ $CURR_BACKUP_TYPE == 'partial' ] || [ $CURR_BACKUP_TYPE == "full" ] ; then
+if [ $CURR_BACKUP_TYPE == 'partial' ] || [ $BACKUP_SCOPE == "full" ] ; then
         if [ ! -f $BackupLocation/$BACKUP_DIRECTORY{{ item['source_path'] }} ]; then
                 mkdir -p $BackupLocation/$BACKUP_DIRECTORY{{ item['source_path'] }}
         fi
@@ -77,7 +77,7 @@ fi
 CURR_BACKUP_TYPE="{{ item['backup_type'] }}"
 
 
-if [ $CURR_BACKUP_TYPE == 'partial' ] || ( [ $CURR_BACKUP_TYPE == "full" ] && [ $DAY_OF_MONTH == "01" ] ); then
+if [ $CURR_BACKUP_TYPE == 'partial' ] || [ $BACKUP_SCOPE == "full" ]; then
         #
         # backup if it's a partial backup, or if it's a full, then it's the first day of the month
         #
