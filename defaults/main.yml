@@ -104,7 +104,7 @@ backup_locations_to_backup:
     source_mounted: true
     exclude_filter: ''
     host_name: host
-    backup_cmd: rsync
+    backup_cmd: rsync -a 
     directory: <directory>
     file_copy: false
     enabled: true
