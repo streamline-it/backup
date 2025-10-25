@@ -2,7 +2,6 @@
 # tasks file for backup
 
 - name: ensure needed variables are defined
-  tags: backup
   ansible.builtin.assert:
     that:
       - backup_directory is defined
@@ -34,7 +33,6 @@
       backup_external_drive_time_month,backup_external_drive_time_weekday)"
 
 - name: ensure these variables are defined specific to cloud backup cronjob
-  tags: backup
   ansible.builtin.assert:
     that:
       - backup_cronjob_user is defined
@@ -55,7 +53,6 @@
       backup_cloud_backup_kickoff_time_weekday)"
 
 - name: ensure the backup folder exists
-  tags: backup
   ansible.builtin.file:
     path: "{{ backup_directory['dir_name'] }}"
     owner: "{{ backup_directory['owner'] }}"
@@ -64,21 +61,18 @@
     state: directory
 
 - name: ensure the scripts directory exists
-  tags: backup
   ansible.builtin.file:
     path: "{{ backup_script_directory }}"
     mode: "0770"
     state: directory
     
 - name: ensure the log file exists
-  tags: backup
   ansible.builtin.copy:
     content: ""
     dest: "{{ backup_logfile_path }}"
     force: false
 
 - name: ensure the backup queue file exists
-  tags: backup
   ansible.builtin.copy:
     content: ""
     dest: "{{ backup_queue_filepath }}"
@@ -88,7 +82,6 @@
   when: 
     - backup_external_drive_option == true
   register: stat_var
-  tags: backup
   ansible.builtin.stat:
     path: "{{ backup_external_drive[0]['full_name'] }}"
     get_attributes: true
@@ -97,13 +90,11 @@
   when:
     - backup_external_drive_option == true
     - stat_var['stat']['exists'] == false
-  tags: backup
   ansible.builtin.include_tasks: "./tasks/{{ ansible_os_family }}_setup_external_drive.yml"
 
 - name: ensure mountpoint for external drive exists
   when:
     - backup_external_drive_option == true
-  tags: backup
   ansible.builtin.file:
     path: "{{ backup_mount_point }}"
     state: directory
@@ -112,7 +103,6 @@
   when:
     - backup_external_drive_option == true
     - backup_mount_method == "device"
-  tags: backup
   ansible.builtin.mount:
     src: "{{ backup_external_drive[0]['full_name'] }}"
     path: "{{ backup_external_drive[0]['mount_point'] }}"
@@ -125,7 +115,6 @@
   when:
     - backup_external_drive_option == true
     - backup_mount_method == "label"
-  tags: backup
   ansible.builtin.mount:
     src: "/dev/gpt/{{ backup_external_drive[0]['label'] }}"
     path: "{{ backup_external_drive[0]['mount_point'] }}"
@@ -136,7 +125,6 @@
 
 
 - name: ensure the external drive cronjob exists
-  tags: backup
   when:
     - backup_external_drive_option == true
   ansible.builtin.cron:
@@ -154,7 +142,6 @@
 - name: ensure the cloud backup cronjob exists
   when:
     - backup_cloud_backup_option == true
-  tags: backup
   ansible.builtin.cron:
     user: "{{ backup_cronjob_user }}"
     cron_file: "{{ backup_cloud_backup_cronjob_name }}"
@@ -168,7 +155,6 @@
     state: present
 
 - name: ensure the external backup script exists
-  tags: backup
   loop:
     "{{ backup_external_drive_scripts }}"
   ansible.builtin.template:
@@ -177,7 +163,6 @@
     mode: '0770'
 
 - name: ensure backup related files exist specific to external drive backup
-  tags: backup
   loop:
     - free_space_for_backup.txt
   ansible.builtin.copy:

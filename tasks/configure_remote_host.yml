@@ -1,5 +1,4 @@
 - name: ensure needed variables are defined specific to backup operations
-  tags: backup
   ansible.builtin.assert:
     that:
       - backup_script_directory is defined
@@ -9,7 +8,6 @@
     fail_msg: "Make sure to define the following variables (backup_script_directory, backup_scripts, backup_mount_point, backup_locations_to_backup)."
 
 - name: ensure needed variables are defined specific to the backup cronjob
-  tags: backup
   ansible.builtin.assert:
     that:
       - backup_cronjob_user is defined
@@ -26,19 +24,16 @@
       backup_remote_backup_kickoff_time_month, backup_remote_backup_kickoff_time_weekday"
 
 - name: ensure backup script(s) directory exists
-  tags: backup
   ansible.builtin.file:
     path: "{{ backup_script_directory }}"
     state: directory
 
 - name: ensure free_space_for_backup.txt file exists
-  tags: backup
   ansible.builtin.copy:
     src: free_space_for_backup.txt
     dest: "{{ backup_script_directory }}/free_space_for_backup.txt "
 
 - name: ensure backup scripts exists
-  tags: backup
   loop:
     "{{ backup_scripts }}"
   ansible.builtin.template:
@@ -48,13 +43,11 @@
     mode: "0770"
 
 - name: ensure backup mount directory(s) exists
-  tags: backup
   ansible.builtin.file:
     path: "{{ backup_mount_point }}"
     state: directory
 
 - name: ensure backup mount(s) exists in fstab
-  tags: backup
   ansible.builtin.mount:
     src: "{{ backup_locations_to_backup[0]['remote_path'] }}"
     path: "{{ backup_mount_point }}"
@@ -64,7 +57,6 @@
     state: present
 
 - name: ensure host has backup cronjob enabled
-  tags: backup
   ansible.builtin.cron:
     user: "{{ backup_cronjob_user }}"
     cron_file: "{{ backup_remote_host_backup_cronjob_name }}"
