@@ -34,6 +34,7 @@ backup_directory:
 
 backup_logfile_path: "{{ backup_directory['dir_name'] }}/backup_log.txt"
 backup_script_directory: /root/scripts/backup
+backup_archive_directory: /exp/nfs/priv/archive
 backup_queue_filepath: "{{ backup_directory['dir_name'] }}/queue.txt"
 
 # purpose is to place the backups underneath a directory of the host's name
