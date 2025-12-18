@@ -69,6 +69,7 @@
 - name: ensure the archive directory exists
   ansible.builtin.file:
     path: "{{ backup_archive_directory }}"
+    mode: '0750'
     state: directory
 
 - name: ensure the log file exists
