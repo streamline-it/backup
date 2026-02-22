@@ -5,8 +5,12 @@ Performs backups.  This is capable of backing up entire directories using rsync 
 
 This will configure the backup host which uses nfs to share it's backup locations.  It will also configure the backup remote servers.  The "backup_operation" variable will control what will get configured.  If this variable is set to "h" it will configure the backup host.  If the variable is set to "r", it configures the remote host.  The "remote host" in this case is the host that has files to be backed up to the backup host.
 
+This role allows you to backup to an an "external" drive which can be any type of storage device.  And it allows you to set a "cloud-based" backup option.
+
 Requirements
 ------------
+
+None
 
 Role Variables
 --------------
@@ -32,9 +36,13 @@ backup_directory:
   owner: root
   groups: root
 
+# location specs
 backup_logfile_path: "{{ backup_directory['dir_name'] }}/backup_log.txt"
 backup_script_directory: /root/scripts/backup
 backup_archive_directory: /exp/nfs/priv/archive
+# this is used for the external drive backup.  Backups
+# in this file are used as a queue of what needs to be copied to 
+# the external drive
 backup_queue_filepath: "{{ backup_directory['dir_name'] }}/queue.txt"
 
 # purpose is to place the backups underneath a directory of the host's name

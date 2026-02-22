@@ -16,6 +16,9 @@
 
 - name: include os specific variables
   include_vars: "{{ ansible_os_family }}_script_vars.yml"
+
+- name: call tasks for assertions
+  ansible.builtin.include_tasks: assertions.yml
  
 - name: call task to ensure the backup host is configured
   when:

@@ -1,0 +1,93 @@
+---
+- name: ensure first round of default variables are defined
+  ansible.builtin.assert:
+    that:
+      - backup_operation is defined
+      - backup_operation is truthy
+      - backup_logfile_name is defined
+      - backup_logfile_name is truthy
+      - backup_logfile_path is defined
+      - backup_logfile_path is truthy
+      - backup_directory is defined
+      - backup_directory is truthy
+      - backup_script_directory is defined
+      - backup_script_directory is truthy
+      - backup_archive_directory is defined
+      - backup_archive_directory is truthy
+      - backup_queue_name is defined
+      - backup_queue_name is truthy
+      - backup_queue_filepath is defined
+      - backup_queue_filepath is truthy
+      - backup_remote_hostname is defined
+      - backup_mount_point is defined
+      - backup_mount_point is truthy
+      - backup_remote_host_backup_kickoff_time_hour is defined
+      - backup_remote_host_backup_kickoff_time_hour is truthy
+      - backup_remote_host_backup_kickoff_time_minute is defined
+      - backup_remote_host_backup_kickoff_time_minute is truthy
+      - backup_remote_host_backup_kickoff_time_day is defined
+      - backup_remote_host_backup_kickoff_time_day is truthy
+      - backup_remote_host_backup_kickoff_time_month is defined
+      - backup_remote_host_backup_kickoff_time_month is truthy
+      - backup_remote_host_backup_kickoff_time_weekday is defined
+      - backup_remote_host_backup_kickoff_time_weekday is truthy
+      - backup_remote_host_backup_cronjob_name is defined
+      - backup_remote_host_backup_cronjob_name is truthy
+      - backup_remote_host_backup_cronjob_job is defined
+      - backup_remote_host_backup_cronjob_job is truthy
+      - backup_mount_method is defined is defined
+      - backup_mount_method is defined is truthy
+      - backup_cronjob_user is defined
+      - backup_cronjob_user is truthy
+      - backup_locations_to_backup is defined
+      - backup_locations_to_backup is truthy
+      - backup_freebsd_disk_scheme is defined
+      - backup_freebsd_disk_scheme is truthy
+      - backup_exclude_directories is defined
+      - backup_exclude_directories is truthy
+      - backup_cloud_backup_option is defined
+      - backup_cloud_backup_option is truthy
+      - backup_external_drive_option is defined
+      - backup_external_drive_option is truthy
+    fail_msg: All these default variables need to be defined
+
+- name: if using backup cloud option is enabled check variables
+  when: backup_cloud_backup_option == true
+  ansible.builtin.assert:
+    that:
+      - backup_cloud_backup_kickoff_time_hour is defined
+      - backup_cloud_backup_kickoff_time_hour is truthy
+      - backup_cloud_backup_kickoff_time_minute is defined
+      - backup_cloud_backup_kickoff_time_minute is truthy
+      - backup_cloud_backup_kickoff_time_day is defined
+      - backup_cloud_backup_kickoff_time_day is truthy
+      - backup_cloud_backup_kickoff_time_month is defined
+      - backup_cloud_backup_kickoff_time_month is truthy
+      - backup_cloud_backup_kickoff_time_weekday is defined
+      - backup_cloud_backup_kickoff_time_weekday is truthy
+      - backup_cloud_backup_cronjob_name is defined
+      - backup_cloud_backup_cronjob_name is truthy
+      - backup_cloud_backup_cronjob_job is defined
+      - backup_cloud_backup_cronjob_job is truthy
+    fail_msg: "These clould based variables must be defined"
+
+- name: if using backup cloud option is enabled check variables
+  when: backup_external_drive_option == true
+  ansible.builtin.assert:
+    that:
+      - backup_external_drive is defined
+      - backup_external_drive is truthy
+      - backup_external_drive_kickoff_time_hour is defined
+      - backup_external_drive_kickoff_time_hour is truthy
+      - backup_external_drive_kickoff_time_minute is defined
+      - backup_external_drive_kickoff_time_minute is truthy
+      - backup_external_drive_kickoff_time_day is defined
+      - backup_external_drive_kickoff_time_day is truthy
+      - backup_external_drive_kickoff_time_month is defined
+      - backup_external_drive_kickoff_time_month is truthy
+      - backup_external_drive_kickoff_time_weekday is defined
+      - backup_external_drive_kickoff_time_weekday is truthy
+      - backup_external_drive_cronjob_name is defined
+      - backup_external_drive_cronjob_name is truthy
+      - backup_external_drive_cronjob_job is defined
+      - backup_external_drive_cronjob_job is truthy
