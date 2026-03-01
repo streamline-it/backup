@@ -1,32 +1,23 @@
-- name: ensure needed variables are defined specific to backup operations
-  ansible.builtin.assert:
-    that:
-      - backup_script_directory is defined
-      - backup_scripts is defined
-      - backup_mount_point is defined
-      - backup_locations_to_backup is defined
-    fail_msg: "Make sure to define the following variables (backup_script_directory, backup_scripts, backup_mount_point, backup_locations_to_backup)."
-
-- name: ensure needed variables are defined specific to the backup cronjob
-  ansible.builtin.assert:
-    that:
-      - backup_cronjob_user is defined
-      - backup_remote_host_backup_cronjob_name is defined
-      - backup_remote_host_backup_cronjob_job is defined
-      - backup_remote_host_backup_kickoff_time_minute is defined
-      - backup_remote_host_backup_kickoff_time_hour is defined
-      - backup_remote_host_backup_kickoff_time_day is defined
-      - backup_remote_host_backup_kickoff_time_month is defined
-      - backup_remote_host_backup_kickoff_time_weekday is defined
-    fail_msg: >
-      "Make sure to define the following variables (backup_cronjob_user, backup_remote_backup_cronjob_name, backup_remote_backup_cronjob_job,  
-      backup_remote_backup_kickoff_time_minute, backup_remote_backup_kickoff_time_hour, backup_remote_backup_kickoff_time_day, 
-      backup_remote_backup_kickoff_time_month, backup_remote_backup_kickoff_time_weekday"
-
 - name: ensure backup script(s) directory exists
   ansible.builtin.file:
     path: "{{ backup_script_directory }}"
     state: directory
+
+- name: ensure rsync is installed (RHEL)
+  when: ansible_os_family == "RedHat"
+  loop:
+    "{{ backup_misc_pkgs }}"
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+
+- name: ensure rsync is installed (FreeBSD)
+  when: ansible_os_family == "FreeBSD"
+  loop:
+    "{{ backup_misc_pkgs }}"
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
 
 - name: ensure free_space_for_backup.txt file exists
   ansible.builtin.copy:

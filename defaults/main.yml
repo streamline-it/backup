@@ -51,7 +51,7 @@ backup_external_drive:
 backup_cloud_backup_option: false
 
 # Below are the cronjob variables a cronjob for the backup host specific to the remote drive option
-backup_external_drive_kickoff_time_hour: 11
+backup_external_drive_kickoff_time_hou: 11
 backup_external_drive_kickoff_time_minute: 0
 backup_external_drive_kickoff_time_day: '*'
 backup_external_drive_kickoff_time_month: '*'
@@ -115,7 +115,7 @@ backup_freebsd_disk_scheme: gpt
 
 # This is needed for FreeBSD systems with the preflight script which uses the du and an exclude option to exlude certain directories.  FreeBSD's du doesn't include this option.
 
-# backup_excude_directories:
+# backup_exclude_directories:
 #  - path: ./priv/videos
 #  - path: ./priv/pics
 

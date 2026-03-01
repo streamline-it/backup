@@ -10,7 +10,7 @@ This role allows you to backup to an an "external" drive which can be any type o
 Requirements
 ------------
 
-None
+Will run on RHEL 7 and later and FreeBSD systems
 
 Role Variables
 --------------
@@ -151,6 +151,10 @@ backup_external_drive_scripts:
   - template_name: preflight_external_drive-bourne.sh.j2
     script_name: preflight_external_drive-remote.sh
 
+backup_root_group: wheel
+
+backup_misc_pkgs:
+  - rsync
 
 vars/Redhat_script_vars.yml
 
@@ -167,20 +171,106 @@ backup_external_drive_scripts:
   - template_name: preflight_external_drive-bash-shell.sh.j2
     script_name: preflight_external_drive.sh
 
+backup_root_group: root
+
+backup_misc_pkgs:
+  - rsync
+
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None.
 
 Example Playbook
 ----------------
 
-I prefer setting the variables in the var host files.  Easier maintenence.
+I prefer setting the variables in the var host files.  Easier maintenence.  
 
-    - hosts: servers
-      roles:
+Backup host setup:
+
+- hosts: backup_server
+
+  vars:
+
+    backup_operation: h
+    backup_external_drive_option: true
+    backup_cloud_backup_option: false
+
+
+    backup_directory:
+      dir_name: /exp/nfs/priv/backups
+      owner: root
+      groups: nfsusers
+
+    backup_external_drive:
+      - dev_name: /dev/vdb
+        size: 1G
+        fstype: xfs
+        mount_fstype: xfs
+        mount_point: /mnt/extdrive
+        full_name: /dev/vdb1
+        label: backups
+
+    backup_mount_point: /mnt/extdrive
+    backup_external_drive_kickoff_time_hour: 12
+    backup_external_drive_kickoff_time_minute: 25
+    backup_external_drive_kickoff_time_day: '*'
+    backup_external_drive_kickoff_time_month: '*'
+    backup_external_drive_kickoff_time_weekday: '0-7'
+    backup_external_drive_cronjob_name: ext_drive_backup
+    backup_external_drive_cronjob_job: "{{ backup_script_directory}}/{{ backup_external_drive_scripts[1]['script_name'] }}"
+
+  roles:
 
         - name: backup
+
+
+Setup for the remote host:
+
+- hosts: clients
+
+  vars:
+
+    my_backup_server_ip: 172.16.20.87
+
+    backup_operation: r
+    backup_remote_hostname: 172.16.20.85
+
+    backup_directory:
+      dir_name: /exp/nfs/priv/backups
+      owner: root
+      groups: nfsusers
+
+    my_backup_server_ip: 172.16.20.87
+
+    backup_remote_hostname: 172.16.20.85
+    backup_external_drive_option: true
+    backup_mount_method: device
+    # remote host's cronjob to back itself up
+    backup_remote_host_backup_kickoff_time_hour: 11
+    backup_remote_host_backup_kickoff_time_minute: 33
+    backup_remote_host_backup_kickoff_time_day: '*'
+    backup_remote_host_backup_kickoff_time_month: '*'
+    backup_remote_host_backup_kickoff_time_weekday: '0-7'
+    backup_remote_host_backup_cronjob_name: host_backup
+    backup_remote_host_backup_cronjob_job: "{{ backup_script_directory}}/{{ backup_scripts[1]['script_name'] }}"
+
+    backup_locations_to_backup:
+      - source_path: /home
+        backup_type: full
+        file_path: ""
+        remote_path: "{{ my_backup_server_ip }}:{{ backup_directory['dir_name'] }}"
+        source_mounted: true
+        exclude_filter: ''
+        host_name: 172.16.20.85
+        backup_cmd: rsync -a
+        directory: "{{ backup_directory['dir_name'] }}"
+        file_copy: false
+        enabled: true
+
+  roles:
+
+    - name: backup
 
 License
 -------
@@ -190,6 +280,5 @@ BSD
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
-
+Rich O'Hara
 

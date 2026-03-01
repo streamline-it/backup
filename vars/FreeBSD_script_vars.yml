@@ -12,3 +12,8 @@ backup_external_drive_scripts:
     script_name: BackupData-external_drive.sh
   - template_name: preflight_external_drive-bourne.sh.j2
     script_name: preflight_external_drive.sh
+
+backup_root_group: wheel
+
+backup_misc_pkgs:
+  - rsync
