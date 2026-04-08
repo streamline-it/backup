@@ -11,8 +11,8 @@
     name: "{{ item }}"
     state: present
 
-- name: ensure rsync is installed (FreeBSD)
-  when: ansible_os_family == "FreeBSD"
+- name: ensure rsync is installed (RHEL)
+  when: ansible_os_family == "RedHat"
   loop:
     "{{ backup_misc_pkgs }}"
   ansible.builtin.dnf:

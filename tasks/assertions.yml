@@ -60,7 +60,7 @@
       - backup_cloud_backup_kickoff_time_minute is defined
       - backup_cloud_backup_kickoff_time_minute is number or backup_cloud_backup_kickoff_time_minute is string | trim | length > 0
       - backup_cloud_backup_kickoff_time_day is defined
-      - backup_cloud_backup_kickoff_time_day is string | trim | length > 0
+      - backup_cloud_backup_kickoff_time_day is number or backup_cloud_backup_kickoff_time_daystring is string | trim | length > 0
       - backup_cloud_backup_kickoff_time_month is defined
       - backup_cloud_backup_kickoff_time_month is number or backup_cloud_backup_kickoff_time_month is string | trim | length > 0
       - backup_cloud_backup_kickoff_time_weekday is defined
@@ -78,13 +78,13 @@
       - backup_remote_host_backup_kickoff_time_hour is defined
       - backup_remote_host_backup_kickoff_time_hour is number or backup_remote_host_backup_kickoff_time_hour is string | trim | length > 0
       - backup_remote_host_backup_kickoff_time_minute is defined
-      - backup_remote_host_backup_kickoff_time_minute is number
+      - backup_remote_host_backup_kickoff_time_minute is number or backup_remote_host_backup_kickoff_time_minute is string | trim | length > 0 
       - backup_remote_host_backup_kickoff_time_day is defined
-      - backup_remote_host_backup_kickoff_time_day is number
+      - backup_remote_host_backup_kickoff_time_day is number or backup_remote_host_backup_kickoff_time_day is string | trim | length > 0
       - backup_remote_host_backup_kickoff_time_month is defined
-      - backup_remote_host_backup_kickoff_time_month is number 
+      - backup_remote_host_backup_kickoff_time_month is number or backup_remote_host_backup_kickoff_time_month is string | trim | length > 0
       - backup_remote_host_backup_kickoff_time_weekday is defined
-      - backup_remote_host_backup_kickoff_time_weekday is number 
+      - backup_remote_host_backup_kickoff_time_weekday is number or backup_remote_host_backup_kickoff_time_weekday is string | trim | length > 0
       - backup_remote_host_backup_cronjob_name is defined
       - backup_remote_host_backup_cronjob_name is truthy
       - backup_remote_host_backup_cronjob_job is defined
@@ -107,16 +107,17 @@
       - backup_external_drive is defined
       - backup_external_drive is truthy
       - backup_external_drive_kickoff_time_hour is defined
-      - backup_external_drive_kickoff_time_hour is number 
+      - backup_external_drive_kickoff_time_hour is number or backup_external_drive_kickoff_time_hour is string | trim | length > 0
       - backup_external_drive_kickoff_time_minute is defined
-      - backup_external_drive_kickoff_time_minute is 
+      - backup_external_drive_kickoff_time_minute is number or backup_external_drive_kickoff_time_minute is string | trim | length > 0
       - backup_external_drive_kickoff_time_day is defined
-      - backup_external_drive_kickoff_time_day is number
+      - backup_external_drive_kickoff_time_day is number or backup_external_drive_kickoff_time_day is string | trim | length > 0
       - backup_external_drive_kickoff_time_month is defined
-      - backup_external_drive_kickoff_time_month is number
+      - backup_external_drive_kickoff_time_month is number or backup_external_drive_kickoff_time_month is string | trim | length > 0
       - backup_external_drive_kickoff_time_weekday is defined
-      - backup_external_drive_kickoff_time_weekday is number
+      - backup_external_drive_kickoff_time_weekday is number or backup_external_drive_kickoff_time_weekday is string | trim | length > 0
       - backup_external_drive_cronjob_name is defined
       - backup_external_drive_cronjob_name is truthy
       - backup_external_drive_cronjob_job is defined
-      - backup_external_drive_cronjob_job is truthy
+      - backup_external_drive_cronjob_job is truthy 
+      - backup_external_drive_kickoff_time_weekday is number or backup_external_drive_kickoff_time_weekday is string | trim | length > 0
